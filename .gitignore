@@ -1,0 +1,32 @@
+HELP.md
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/out
+/dist/
+/nbdist/
+/.nb-gradle/
+/build/
+/vivo_sync.iml
+/vivoDB.mv.db
+/idea/workspace.xml
+/.idea/
+/src/main/resources/credentials/fscloud-firebase-adminsdk-6wib1-946c24e86a.json
