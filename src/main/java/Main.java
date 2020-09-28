@@ -58,6 +58,9 @@ public class Main {
                         System.out.println("New Client Connected : " +
                             callerIp + ":" + receivePacket.getPort());
                         connectedClientsMap.put(callerIp, callerPort);
+                    }else{
+                        System.out.println("Already Client Connected : " +
+                            callerIp + ":" + receivePacket.getPort());
                     }
 
                     //this.playHere(audioData);
