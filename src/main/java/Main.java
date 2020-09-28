@@ -16,8 +16,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Main {
+
+    enum TYPE {
+        SENDER, RECEIVER;
+    }
 
     final int serverPort = 9786;
     int dataPacketSize = 4096;
@@ -26,8 +31,10 @@ public class Main {
     TargetDataLine targetDataLine;
     AudioInputStream inputStream;
     SourceDataLine sourceLine;
-    Map<String, Integer> connectedClientsPortMap = new HashMap(); // [ip:port , port]
-    Map<String, String> connectedClientsIpMap = new HashMap(); // [ip:port , ip]
+    Map<String, Integer> connectedClientsPortMap = new ConcurrentHashMap<>(); // [ip:port , port]
+    Map<String, String> connectedClientsIpMap = new ConcurrentHashMap(); // [ip:port , ip]
+    Map<String, Map<TYPE, Integer>> ipSenderReceiverType_Port = new ConcurrentHashMap();  //[ip, [type, port]]
+    Map<String, Map<Integer, TYPE>> ipSenderReceiverPort_Type = new ConcurrentHashMap();  //[ip, [port, type]]
 
     private AudioFormat getAudioFormat() {
         float sampleRate = 8000.0F;
@@ -55,13 +62,55 @@ public class Main {
 
                     String kKey = getKKey(callerIp, callerPort);
 
+                    System.out.println(kKey);
+                    System.out.println("get Key " + connectedClientsPortMap.get(kKey));
                     if (!connectedClientsPortMap.containsKey(kKey)) {
                         System.out.println("New Client Connected : " +
                             callerIp + ":" + receivePacket.getPort());
                         String code = new String(receivePacket.getData(), StandardCharsets.UTF_8);
-                        System.out.println("serverReply: "+code);
-                        connectedClientsPortMap.put(callerIp, callerPort);
-                        connectedClientsIpMap.put(callerIp, callerIp);
+                        System.out.println("serverReply: " + code);
+                        connectedClientsPortMap.put(kKey, callerPort);
+                        connectedClientsIpMap.put(kKey, callerIp);
+
+                        if (code.contains(TYPE.SENDER.toString())) {
+                            if (ipSenderReceiverType_Port.containsKey(callerIp)) {
+                                System.out.println("1: " + code);
+                                ipSenderReceiverType_Port.get(callerIp).put(TYPE.SENDER, callerPort);
+                                ipSenderReceiverPort_Type.get(callerIp).put(callerPort, TYPE.SENDER);
+                            } else {
+                                System.out.println("2: " + code);
+                                Map<TYPE, Integer> ipPort = new HashMap<>();
+                                ipPort.put(TYPE.SENDER, callerPort);
+                                ipSenderReceiverType_Port.put(callerIp, ipPort);
+
+                                Map<Integer, TYPE> ipType = new HashMap<>();
+                                ipType.put(callerPort, TYPE.SENDER);
+                                ipSenderReceiverPort_Type.put(callerIp, ipType);
+                            }
+                        }
+                        if (code.contains(TYPE.RECEIVER.toString())) {
+                            if (ipSenderReceiverType_Port.containsKey(callerIp)) {
+                                System.out.println("3: " + code);
+                                ipSenderReceiverType_Port.get(callerIp).put(TYPE.RECEIVER, callerPort);
+                                ipSenderReceiverPort_Type.get(callerIp).put(callerPort, TYPE.RECEIVER);
+                            } else {
+                                System.out.println("4: " + code);
+                                Map<TYPE, Integer> ipPort = new HashMap<>();
+                                ipPort.put(TYPE.RECEIVER, callerPort);
+                                ipSenderReceiverType_Port.put(callerIp, ipPort);
+
+                                Map<Integer, TYPE> ipType = new HashMap<>();
+                                ipType.put(callerPort, TYPE.RECEIVER);
+                                ipSenderReceiverPort_Type.put(callerIp, ipType);
+                            }
+                        }
+                        Thread.sleep(200);
+
+                        ipSenderReceiverPort_Type.forEach((ip, m) -> {
+                            m.forEach((type, port) -> {
+                                System.out.println(ip + " : " + port + " : " + type);
+                            });
+                        });
                     }
 
                     new Thread(() -> {
@@ -84,10 +133,10 @@ public class Main {
 
     /**
      * @param connectedClientsIpMap
-     * @param connectedClientsMap : [callerIp,callerPort]
-     *                             //* @param audioData
-     * @param callerIp :            caller ip
-     * @param callerPort :          caller port
+     * @param connectedClientsMap   : [callerIp,callerPort]
+     *                              //* @param audioData
+     * @param callerIp              :            caller ip
+     * @param callerPort            :          caller port
      */
     private void sendToClient(Map<String, String> connectedClientsIpMap, Map<String, Integer> connectedClientsMap, DatagramPacket receivePacket, String callerIp, int callerPort) {
         System.out.println("Connected User count: " + connectedClientsMap.size());
