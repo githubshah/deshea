@@ -20,8 +20,9 @@ class ReceiverThread extends Thread {
     private AudioInputStream audioInputStream;
 
     public ReceiverThread(DatagramSocket ds) throws SocketException {
-        System.out.println("port: " + ds.getPort());
-        System.out.println("ip: " + ds.getInetAddress());
+        System.out.println("ReceiverThread port: " + ds.getPort());
+        System.out.println("ReceiverThread ip: " + ds.getInetAddress());
+        System.out.println("udpClientSocket ds: " + ds);
         this.udpClientSocket = ds;
     }
 
@@ -48,22 +49,17 @@ class ReceiverThread extends Thread {
                 System.out.println("Call dropped");
                 return;
             }
-
             // Set up a DatagramPacket to receive the data into
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            //System.out.println("rec length: "+receivePacket.getLength());
-
             try {
                 // Receive a packet from the server (blocks until the packets are received)
-                System.out.println("PRE RECEIVED: ");
-                udpClientSocket.setSoTimeout(2000); // timeout 10 sec
+                udpClientSocket.setSoTimeout(10000); // timeout 10 sec
+                System.out.println(">>> WAITING RECEIVE......: ");
                 udpClientSocket.receive(receivePacket);
-                System.out.println("RECEIVED: ");
+                System.out.println(">>> RECEIVED: ");
                 try {
                     byte audioData[] = receivePacket.getData();
-                    System.out.println("audio data: " + audioData.length);
                     InputStream byteInputStream = new ByteArrayInputStream(audioData);
-                    adFormat = getAudioFormat();
                     audioInputStream = new AudioInputStream(byteInputStream, adFormat, audioData.length / adFormat.getFrameSize());
                     DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, adFormat);
                     sourceLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);

@@ -10,18 +10,20 @@ class PlayThread extends Thread {
 
     public PlayThread(SourceDataLine sourceLine, AudioInputStream audioInputStream) {
         this.sourceLine = sourceLine;
-        this.inputStream= audioInputStream;
+        this.inputStream = audioInputStream;
     }
 
     byte tempBuffer[] = new byte[4096];
 
     public void run() {
-        //System.out.println("..");
+        if (sourceLine == null || inputStream == null) {
+            System.out.println("source or audio stream null");
+        }
         try {
             int cnt;
             while ((cnt = inputStream.read(tempBuffer, 0, tempBuffer.length)) != -1) {
                 if (cnt > 0) {
-                    //System.out.println(">>>>>>speeker");
+                    System.out.println(">>>>>>speeker voice");
                     sourceLine.write(tempBuffer, 0, cnt);
                 }
             }
