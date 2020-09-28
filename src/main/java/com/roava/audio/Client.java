@@ -18,10 +18,10 @@ public class Client {
 
     public static void main(String args[]) throws Exception {
         // The default port
-        //int clientport = 9786;
-        //String host = "192.168.1.5";
+        int clientport = 9786;
+        String host = "34.66.62.184";
         //String host = "localhost";
-        //openChannal();
+        new Client(host, clientport).openChannel();
     }
 
     ReceiverThread receiver;
