@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,7 +26,7 @@ public class Main {
     TargetDataLine targetDataLine;
     AudioInputStream inputStream;
     SourceDataLine sourceLine;
-    Map<String, Integer> connectedClients = new HashMap();
+    Map<String, Integer> connectedClientsMap = new HashMap();
 
     private AudioFormat getAudioFormat() {
         float sampleRate = 8000.0F;
@@ -43,24 +42,29 @@ public class Main {
     public void runVOIP() {
         try {
             udpServerSocket = new DatagramSocket(serverPort);
-            System.out.println("Server started...\n");
-            System.out.println("on port: " + serverPort);
+            System.out.println("Server started on port: " + serverPort);
             while (true) {
                 byte[] receiveData = new byte[dataPacketSize];
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 udpServerSocket.receive(receivePacket);
-                System.out.println("RECEIVED: " + receivePacket.getAddress().getHostAddress() + " " + receivePacket.getPort());
                 try {
                     byte[] audioData = new byte[4096];
                     audioData = receivePacket.getData();
-                    int clientport = receivePacket.getPort();
+                    int callerPort = receivePacket.getPort();
+                    InetAddress callerInetAddress = receivePacket.getAddress();
+                    String callerIp = callerInetAddress.getHostAddress();
 
-                    InetAddress clientIpAddress = receivePacket.getAddress();
-                    System.out.println("receivePacket: " + clientIpAddress);
-                    connectedClients.put(clientIpAddress.getHostAddress(), clientport);
+                    if (!connectedClientsMap.containsKey(callerIp)) {
+                        System.out.println("New Client Connected : " +
+                            callerIp + ":" + receivePacket.getPort());
+                        connectedClientsMap.put(callerIp, callerPort);
+                    }
 
                     //this.playHere(audioData);
-                    this.sendToClient(connectedClients, audioData, clientIpAddress);
+                    byte[] finalAudioData = audioData;
+                    new Thread(() -> {
+                        this.sendToClient(connectedClientsMap, finalAudioData, callerIp, callerPort);
+                    });
                 } catch (Exception e) {
                     System.out.println(e);
                     System.exit(0);
@@ -71,40 +75,26 @@ public class Main {
         }
     }
 
-    private void sendToClient(Map<String, Integer> connectedClients, byte[] sendData, InetAddress caller) throws UnknownHostException {
-        System.out.println("Send Packet to Client...");
-        connectedClients.forEach((connectedUserIp, clientport) -> {
+    /**
+     * @param connectedClientsMap: [callerIp,callerPort]
+     * @param audioData
+     * @param callerIp:            caller ip
+     * @param callerPort:          caller port
+     */
+    private void sendToClient(Map<String, Integer> connectedClientsMap, byte[] audioData, String callerIp, int callerPort) {
+        System.out.println("Connected User count: " + connectedClientsMap.size());
+        connectedClientsMap.forEach((connectedUserIp, connectedUserPort) -> {
             try {
-                if (!connectedUserIp.equals(caller.getHostAddress())) { // skip local host client
-                    System.out.println("Packet send to ip: " + connectedUserIp + ", port: "+clientport);
+                if (!connectedUserIp.equals(callerIp)) { // skip local host client
+                    System.out.println("Packet send to ip: " + connectedUserIp + ", port: " + connectedUserPort);
                     DatagramPacket sendPacket =
-                        new DatagramPacket(sendData, sendData.length, InetAddress.getByName(connectedUserIp), clientport);
+                        new DatagramPacket(audioData, audioData.length, InetAddress.getByName(connectedUserIp), connectedUserPort);
                     udpServerSocket.send(sendPacket);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-
-        //InetAddress iPAddress = InetAddress.getByName("192.168.1.3");
-//        if(caller.getHostAddress().equals("117.253.22.147")){ // 117.253.22.147 23533
-//            try {
-//                InetAddress neerajIp = InetAddress.getByName("171.60.172.211");
-//                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, neerajIp, 58788);
-//                udpServerSocket.send(sendPacket);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }else{
-//            try {
-//                InetAddress shaidIp = InetAddress.getByName("117.253.22.147");
-//                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, shaidIp, 23533);
-//                udpServerSocket.send(sendPacket);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-
     }
 
     private void playHere(byte[] audioData) throws LineUnavailableException {
