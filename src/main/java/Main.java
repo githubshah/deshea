@@ -8,6 +8,7 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.TargetDataLine;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -36,6 +37,10 @@ public class Main {
     Map<String, Map<TYPE, Integer>> ipSenderReceiverType_Port = new ConcurrentHashMap();  //[ip, [type, port]]
     Map<String, Map<Integer, TYPE>> ipSenderReceiverPort_Type = new ConcurrentHashMap();  //[ip, [port, type]]
 
+
+    Map<String, String> roomToFrom = new HashMap<>();
+    Map<String, String> roomFromTo = new HashMap<>();
+
     private AudioFormat getAudioFormat() {
         float sampleRate = 8000.0F;
         int sampleSizeInBits = 16;
@@ -48,6 +53,11 @@ public class Main {
     DatagramSocket udpServerSocket;
 
     public void runVOIP() {
+        String shaidIp = "132.154.125.103";
+        String shaidIp2 = "132.154.66.61";
+        roomToFrom.put(shaidIp, shaidIp2);
+        roomFromTo.put(shaidIp2, shaidIp);
+
         try {
             udpServerSocket = new DatagramSocket(serverPort);
             System.out.println("Server started on port: " + serverPort);
@@ -139,21 +149,34 @@ public class Main {
      * @param callerPort            :          caller port
      */
     private void sendToClient(Map<String, String> connectedClientsIpMap, Map<String, Integer> connectedClientsMap, DatagramPacket receivePacket, String callerIp, int callerPort) {
-        System.out.println("Connected User count: " + connectedClientsMap.size());
-//        connectedClientsMap.forEach((connectedUserIp, connectedUserPort) -> {
-//            try {
-//                if (!connectedUserIp.equals(callerIp)) { // skip local host client
-//                    Thread.yield();
-//                    System.out.println("Packet send to ip: " + connectedUserIp + ", port: " + connectedUserPort);
-//                    DatagramPacket sendPacket =
-//                        new DatagramPacket(receivePacket.getData(),
-//                            receivePacket.getData().length, InetAddress.getByName(connectedUserIp), connectedUserPort);
-//                    udpServerSocket.send(sendPacket);
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        });
+
+        /*
+         * 1. get user from its room i.e ip of connect user
+         * 2. get type of packet. i.e sender or receiver note 99.9% will be sender
+         * 3. if(sender) => get connected ip and receiver port
+         * 4. if(receiver) => get connected ip and sender port
+         * */
+
+        String destinationUserIp = roomToFrom.get(callerIp);
+        if (destinationUserIp == null) {
+            destinationUserIp = roomFromTo.get(callerIp);
+        }
+
+        if (destinationUserIp != null) {
+            int destinationUserPort = ipSenderReceiverType_Port.get(destinationUserIp).get(TYPE.RECEIVER);
+            System.out.println(callerIp + ":" + callerPort + " => " + destinationUserIp + ":" + destinationUserPort);
+
+            try {
+                Thread.yield();
+                System.out.println("Packet send to ip: " + destinationUserIp + ", port: " + destinationUserPort);
+                DatagramPacket sendPacket =
+                    new DatagramPacket(receivePacket.getData(),
+                        receivePacket.getData().length, InetAddress.getByName(destinationUserIp), destinationUserPort);
+                udpServerSocket.send(sendPacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void playHere(byte[] audioData) throws LineUnavailableException {
