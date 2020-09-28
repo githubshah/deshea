@@ -2,10 +2,12 @@ package com.roava.audio;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 
 class SenderThread extends Thread {
 
@@ -25,6 +27,13 @@ class SenderThread extends Thread {
         this.clientSenderSocket.connect(serverIPAddress, serverPort);
         System.out.println("Sender Thread Connected to the server "
             + this.serverIPAddress.getHostAddress() + ":" + this.serverPort);
+        try {
+            byte[] sendData = new byte[10];
+            sendData = "SENDER".getBytes( StandardCharsets.UTF_8 );
+            clientSenderSocket.send(new DatagramPacket(sendData,sendData.length));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         this.micLine = new Mic().openMicLine();
         System.out.println("Sender Thread Opened Mic");
     }

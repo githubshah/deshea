@@ -37,7 +37,7 @@ public class Client {
         InetAddress ia = InetAddress.getByName(host);
         SenderThread sender = new SenderThread(ia, clientPort);
         sender.start();
-        receiver = new ReceiverThread(sender.getSocket());
+        receiver = new ReceiverThread(ia, clientPort);
         receiver.start();
     }
 
