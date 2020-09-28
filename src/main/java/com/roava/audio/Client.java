@@ -28,14 +28,14 @@ public class Client {
 
     public void openChannel() throws UnknownHostException, SocketException, LineUnavailableException {
         String host = ServerSetting.SERVER_IP;
-        int clientport = ServerSetting.SERVER_PORT;
+        int clientPort = ServerSetting.SERVER_PORT;
 
         // Get the port number to use from the command line
-        System.out.println("Usage: UDPClient " + "Now using host = " + host + ", Port# = " + clientport);
+        System.out.println("Usage: UDPClient " + "Now using host = " + host + ", Port# = " + clientPort);
 
         // Get the IP address of the local machine - we will use this as the address to send the data to
         InetAddress ia = InetAddress.getByName(host);
-        SenderThread sender = new SenderThread(ia, clientport);
+        SenderThread sender = new SenderThread(ia, clientPort);
         sender.start();
         receiver = new ReceiverThread(sender.getSocket());
         receiver.start();

@@ -12,18 +12,21 @@ class SenderThread extends Thread {
     private InetAddress serverIPAddress;
     private DatagramSocket clientSenderSocket;
     private boolean stopped = false;
-    private int serverport;
-    TargetDataLine targetDataLine;
+    private int serverPort;
+    private TargetDataLine micLine;
 
     //InetAddress IPAddress = InetAddress.getByName("192.168.1.3");
-    public SenderThread(InetAddress address, int serverport)
+    public SenderThread(InetAddress serverIPAddress, int serverPort)
         throws SocketException, LineUnavailableException {
-        this.serverIPAddress = address;
-        this.serverport = serverport;
+        this.serverIPAddress = serverIPAddress;
+        this.serverPort = serverPort;
         // Create client DatagramSocket
         this.clientSenderSocket = new DatagramSocket();
-        this.clientSenderSocket.connect(serverIPAddress, serverport);
-        targetDataLine = new Mic().getTargetDataLine();
+        this.clientSenderSocket.connect(serverIPAddress, serverPort);
+        System.out.println("Sender Thread Connected to the server "
+            + this.serverIPAddress.getHostAddress() + ":" + this.serverPort);
+        this.micLine = new Mic().openMicLine();
+        System.out.println("Sender Thread Opened Mic");
     }
 
     public void halt() {
@@ -38,7 +41,7 @@ class SenderThread extends Thread {
 
     public void run() {
 
-        if (this.targetDataLine == null) {
+        if (this.micLine == null) {
             System.out.println("LineUnavailableException unavailable");
             return;
         }
@@ -51,13 +54,12 @@ class SenderThread extends Thread {
         boolean stopaudioCapture = false;
         try {
             int cnt;
-            System.out.println("serverIPAddress: "+serverIPAddress);
-            System.out.println("serverport: "+serverport);
             while (!stopaudioCapture) {
-                cnt = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
+                cnt = micLine.read(tempBuffer, 0, tempBuffer.length);
                 if (cnt > 0) {
-                    DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, serverIPAddress, serverport);
+                    DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, serverIPAddress, serverPort);
                     clientSenderSocket.send(sendPacket);
+                    System.out.println(">>>>>> mic to server: " + serverIPAddress.getHostAddress() + ":" + serverPort);
                     Thread.yield();
                 }
             }

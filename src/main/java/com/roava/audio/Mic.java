@@ -34,7 +34,7 @@ public class Mic {
         return new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
     }
 
-    public TargetDataLine getTargetDataLine() throws LineUnavailableException {
+    public TargetDataLine openMicLine() throws LineUnavailableException {
         try {
             targetDataLine.open(adFormat);
             this.targetDataLine.start();

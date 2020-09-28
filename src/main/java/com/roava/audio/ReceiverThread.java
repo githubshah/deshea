@@ -4,6 +4,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,11 +20,12 @@ class ReceiverThread extends Thread {
     private SourceDataLine sourceLine;
     private AudioInputStream audioInputStream;
 
-    public ReceiverThread(DatagramSocket ds) throws SocketException {
-        System.out.println("ReceiverThread port: " + ds.getPort());
-        System.out.println("ReceiverThread ip: " + ds.getInetAddress());
-        System.out.println("udpClientSocket ds: " + ds);
+    public ReceiverThread(DatagramSocket ds) throws SocketException, LineUnavailableException {
+        System.out.println("Receiver Thread Connected to the server "
+            + ds.getInetAddress().getHostAddress() + ":" + ds.getPort());
         this.udpClientSocket = ds;
+        System.out.println("Sender Thread Opened Speaker");
+        this.openSpeaker();
     }
 
     public void halt() {
@@ -40,10 +42,8 @@ class ReceiverThread extends Thread {
     }
 
     public void run() {
-
         // Create a byte buffer/array for the receive Datagram packet
         byte[] receiveData = new byte[4096];
-        AudioFormat adFormat = getAudioFormat();
         while (true) {
             if (stopped) { // todo
                 System.out.println("Call dropped");
@@ -54,31 +54,29 @@ class ReceiverThread extends Thread {
             try {
                 // Receive a packet from the server (blocks until the packets are received)
                 udpClientSocket.setSoTimeout(10000); // timeout 10 sec
-                System.out.println(">>> WAITING RECEIVE......: ");
+                System.out.println("waiting to receive data from server...");
                 udpClientSocket.receive(receivePacket);
-                System.out.println(">>> RECEIVED: ");
                 try {
                     byte audioData[] = receivePacket.getData();
                     InputStream byteInputStream = new ByteArrayInputStream(audioData);
-                    audioInputStream = new AudioInputStream(byteInputStream, adFormat, audioData.length / adFormat.getFrameSize());
-                    DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, adFormat);
-                    sourceLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
-                    sourceLine.open(adFormat);
-                    sourceLine.start();
+                    audioInputStream = new AudioInputStream(byteInputStream, getAudioFormat(), audioData.length / getAudioFormat().getFrameSize());
                     Thread t = new Thread(new PlayThread(sourceLine, audioInputStream));
                     t.start();
-                    System.out.println("2RECEIVED: ");
                 } catch (Exception e) {
                     e.getStackTrace();
                 }
-
-                // print to the screen
-                //System.out.println("kohli UDPClient: Response from Server: \"" + serverReply + "\"\n");
-
-                Thread.yield();
             } catch (IOException ex) {
                 System.err.println(ex);
             }
+            Thread.yield();
         }
+    }
+
+    private void openSpeaker() throws LineUnavailableException {
+        AudioFormat adFormat = getAudioFormat();
+        DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, adFormat);
+        sourceLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
+        sourceLine.open(adFormat);
+        sourceLine.start();
     }
 }
