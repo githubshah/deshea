@@ -27,7 +27,7 @@ public class Main {
     TargetDataLine targetDataLine;
     AudioInputStream inputStream;
     SourceDataLine sourceLine;
-    Map<InetAddress, Integer> connectedClients = new HashMap();
+    Map<String, Integer> connectedClients = new HashMap();
 
     private AudioFormat getAudioFormat() {
         float sampleRate = 8000.0F;
@@ -57,7 +57,7 @@ public class Main {
 
                     InetAddress clientIpAddress = receivePacket.getAddress();
                     System.out.println("receivePacket: " + clientIpAddress);
-                    connectedClients.put(clientIpAddress, clientport);
+                    connectedClients.put(clientIpAddress.getHostAddress(), clientport);
 
                     //this.playHere(audioData);
                     this.sendToClient(connectedClients, audioData, clientIpAddress);
@@ -71,41 +71,39 @@ public class Main {
         }
     }
 
-    private void sendToClient(Map<InetAddress, Integer> connectedClients, byte[] sendData, InetAddress caller) throws UnknownHostException {
+    private void sendToClient(Map<String, Integer> connectedClients, byte[] sendData, InetAddress caller) throws UnknownHostException {
         System.out.println("Send Packet to Client...");
-        //InetAddress iPAddress = InetAddress.getByName("192.168.1.3");
-        /*connectedClients.forEach((connectedUser, clientport) -> {
+        connectedClients.forEach((connectedUserIp, clientport) -> {
             try {
-                if (!connectedUser.getHostAddress().equals(caller.getHostAddress())) { // skip local host client
-                    System.out.println("");
-                    System.out.println("Packet send to ip: " + connectedUser.getHostAddress());
-                    System.out.println("Packet send to port: " + clientport);
-                    System.out.println();
-                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, connectedUser, clientport);
+                if (!connectedUserIp.equals(caller.getHostAddress())) { // skip local host client
+                    System.out.println("Packet send to ip: " + connectedUserIp + ", port: "+clientport);
+                    DatagramPacket sendPacket =
+                        new DatagramPacket(sendData, sendData.length, InetAddress.getByName(connectedUserIp), clientport);
                     udpServerSocket.send(sendPacket);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });*/
+        });
 
-        if(caller.getHostAddress().equals("117.253.22.147")){ // 117.253.22.147 23533
-            try {
-                InetAddress neerajIp = InetAddress.getByName("171.60.172.211");
-                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, neerajIp, 58788);
-                udpServerSocket.send(sendPacket);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }else{
-            try {
-                InetAddress shaidIp = InetAddress.getByName("117.253.22.147");
-                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, shaidIp, 23533);
-                udpServerSocket.send(sendPacket);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        //InetAddress iPAddress = InetAddress.getByName("192.168.1.3");
+//        if(caller.getHostAddress().equals("117.253.22.147")){ // 117.253.22.147 23533
+//            try {
+//                InetAddress neerajIp = InetAddress.getByName("171.60.172.211");
+//                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, neerajIp, 58788);
+//                udpServerSocket.send(sendPacket);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }else{
+//            try {
+//                InetAddress shaidIp = InetAddress.getByName("117.253.22.147");
+//                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, shaidIp, 23533);
+//                udpServerSocket.send(sendPacket);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
     }
 
