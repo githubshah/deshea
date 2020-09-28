@@ -57,9 +57,8 @@ class ReceiverThread extends Thread {
                 System.out.println("waiting to receive data from server...");
                 udpClientSocket.receive(receivePacket);
                 try {
-                    byte audioData[] = receivePacket.getData();
-                    InputStream byteInputStream = new ByteArrayInputStream(audioData);
-                    audioInputStream = new AudioInputStream(byteInputStream, getAudioFormat(), audioData.length / getAudioFormat().getFrameSize());
+                    InputStream byteInputStream = new ByteArrayInputStream(receivePacket.getData());
+                    audioInputStream = new AudioInputStream(byteInputStream, getAudioFormat(), receivePacket.getData().length / getAudioFormat().getFrameSize());
                     Thread t = new Thread(new PlayThread(sourceLine, audioInputStream));
                     t.start();
                 } catch (Exception e) {
