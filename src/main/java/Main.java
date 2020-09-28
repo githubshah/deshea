@@ -74,7 +74,7 @@ public class Main {
     private void sendToClient(Map<InetAddress, Integer> connectedClients, byte[] sendData, InetAddress caller) throws UnknownHostException {
         System.out.println("Send Packet to Client...");
         //InetAddress iPAddress = InetAddress.getByName("192.168.1.3");
-        connectedClients.forEach((connectedUser, clientport) -> {
+        /*connectedClients.forEach((connectedUser, clientport) -> {
             try {
                 if (!connectedUser.getHostAddress().equals(caller.getHostAddress())) { // skip local host client
                     System.out.println("");
@@ -87,7 +87,26 @@ public class Main {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
+        });*/
+
+        if(caller.getHostAddress().equals("117.253.22.147")){ // 117.253.22.147 23533
+            try {
+                InetAddress neerajIp = InetAddress.getByName("171.60.172.211");
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, neerajIp, 58788);
+                udpServerSocket.send(sendPacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            try {
+                InetAddress shaidIp = InetAddress.getByName("117.253.22.147");
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, shaidIp, 23533);
+                udpServerSocket.send(sendPacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private void playHere(byte[] audioData) throws LineUnavailableException {
