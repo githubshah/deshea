@@ -8,11 +8,11 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.TargetDataLine;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -58,7 +58,7 @@ public class Main {
                     if (!connectedClientsPortMap.containsKey(kKey)) {
                         System.out.println("New Client Connected : " +
                             callerIp + ":" + receivePacket.getPort());
-                        String code =  new String(receivePacket.getData(), 0, receivePacket.getLength());
+                        String code = new String(receivePacket.getData(), StandardCharsets.UTF_8);
                         System.out.println("serverReply: "+code);
                         connectedClientsPortMap.put(callerIp, callerPort);
                         connectedClientsIpMap.put(callerIp, callerIp);
