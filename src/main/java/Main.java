@@ -59,7 +59,7 @@ public class Main {
                     System.out.println("receivePacket: " + clientIpAddress);
                     connectedClients.put(clientIpAddress, clientport);
 
-                    this.playHere(audioData);
+                    //this.playHere(audioData);
                     this.sendToClient(connectedClients, audioData, clientIpAddress);
                 } catch (Exception e) {
                     System.out.println(e);
