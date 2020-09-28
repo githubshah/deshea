@@ -26,7 +26,8 @@ public class Main {
     TargetDataLine targetDataLine;
     AudioInputStream inputStream;
     SourceDataLine sourceLine;
-    Map<String, Integer> connectedClientsMap = new HashMap(); // [ip , port]
+    Map<String, Integer> connectedClientsPortMap = new HashMap(); // [ip:port , port]
+    Map<String, String> connectedClientsIpMap = new HashMap(); // [ip:port , ip]
 
     private AudioFormat getAudioFormat() {
         float sampleRate = 8000.0F;
@@ -52,14 +53,20 @@ public class Main {
                     InetAddress callerInetAddress = receivePacket.getAddress();
                     String callerIp = callerInetAddress.getHostAddress();
 
-                    if (!connectedClientsMap.containsKey(callerIp) || callerPort != connectedClientsMap.get(callerIp)) {
+                    String kKey = getKKey(callerIp, callerPort);
+
+                    if (!connectedClientsPortMap.containsKey(kKey)) {
                         System.out.println("New Client Connected : " +
                             callerIp + ":" + receivePacket.getPort());
-                        connectedClientsMap.put(callerIp, callerPort);
+                        String code =  new String(receivePacket.getData(), 0, receivePacket.getLength());
+                        System.out.println("serverReply: "+code);
+                        connectedClientsPortMap.put(callerIp, callerPort);
+                        connectedClientsIpMap.put(callerIp, callerIp);
                     }
 
                     new Thread(() -> {
-                        this.sendToClient(connectedClientsMap, receivePacket, callerIp, callerPort);
+                        this.sendToClient(connectedClientsIpMap, connectedClientsPortMap,
+                            receivePacket, callerIp, callerPort);
                     }).start();
                 } catch (Exception e) {
                     System.out.println(e);
@@ -71,28 +78,33 @@ public class Main {
         }
     }
 
+    private String getKKey(String callerIp, int callerPort) {
+        return callerIp + ":" + callerPort;
+    }
+
     /**
-     * @param connectedClientsMap: [callerIp,callerPort]
+     * @param connectedClientsIpMap
+     * @param connectedClientsMap : [callerIp,callerPort]
      *                             //* @param audioData
-     * @param callerIp:            caller ip
-     * @param callerPort:          caller port
+     * @param callerIp :            caller ip
+     * @param callerPort :          caller port
      */
-    private void sendToClient(Map<String, Integer> connectedClientsMap, DatagramPacket receivePacket, String callerIp, int callerPort) {
+    private void sendToClient(Map<String, String> connectedClientsIpMap, Map<String, Integer> connectedClientsMap, DatagramPacket receivePacket, String callerIp, int callerPort) {
         System.out.println("Connected User count: " + connectedClientsMap.size());
-        connectedClientsMap.forEach((connectedUserIp, connectedUserPort) -> {
-            try {
-                if (!connectedUserIp.equals(callerIp)) { // skip local host client
-                    Thread.yield();
-                    System.out.println("Packet send to ip: " + connectedUserIp + ", port: " + connectedUserPort);
-                    DatagramPacket sendPacket =
-                        new DatagramPacket(receivePacket.getData(),
-                            receivePacket.getData().length, InetAddress.getByName(connectedUserIp), connectedUserPort);
-                    udpServerSocket.send(sendPacket);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+//        connectedClientsMap.forEach((connectedUserIp, connectedUserPort) -> {
+//            try {
+//                if (!connectedUserIp.equals(callerIp)) { // skip local host client
+//                    Thread.yield();
+//                    System.out.println("Packet send to ip: " + connectedUserIp + ", port: " + connectedUserPort);
+//                    DatagramPacket sendPacket =
+//                        new DatagramPacket(receivePacket.getData(),
+//                            receivePacket.getData().length, InetAddress.getByName(connectedUserIp), connectedUserPort);
+//                    udpServerSocket.send(sendPacket);
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        });
     }
 
     private void playHere(byte[] audioData) throws LineUnavailableException {
