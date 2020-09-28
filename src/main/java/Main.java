@@ -67,7 +67,7 @@ public class Main {
                     byte[] finalAudioData = audioData;
                     new Thread(() -> {
                         this.sendToClient(connectedClientsMap, finalAudioData, callerIp, callerPort);
-                    });
+                    }).start();
                 } catch (Exception e) {
                     System.out.println(e);
                     System.exit(0);
