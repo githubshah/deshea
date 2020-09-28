@@ -162,12 +162,11 @@ public class Main {
             destinationUserIp = roomFromTo.get(callerIp);
         }
 
-        if (destinationUserIp != null && ipSenderReceiverType_Port.get(destinationUserIp) != null) {
+        if (destinationUserIp != null && ipSenderReceiverType_Port.get(destinationUserIp) != null && !callerIp.equals(destinationUserIp)) {
             int destinationUserPort = ipSenderReceiverType_Port.get(destinationUserIp).get(TYPE.RECEIVER);
             System.out.println(callerIp + ":" + callerPort + " => " + destinationUserIp + ":" + destinationUserPort);
 
             try {
-                Thread.yield();
                 System.out.println("Packet send to ip: " + destinationUserIp + ", port: " + destinationUserPort);
                 DatagramPacket sendPacket =
                     new DatagramPacket(receivePacket.getData(),
