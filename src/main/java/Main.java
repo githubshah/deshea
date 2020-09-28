@@ -162,7 +162,7 @@ public class Main {
             destinationUserIp = roomFromTo.get(callerIp);
         }
 
-        if (destinationUserIp != null) {
+        if (destinationUserIp != null && ipSenderReceiverType_Port.get(destinationUserIp) != null) {
             int destinationUserPort = ipSenderReceiverType_Port.get(destinationUserIp).get(TYPE.RECEIVER);
             System.out.println(callerIp + ":" + callerPort + " => " + destinationUserIp + ":" + destinationUserPort);
 
