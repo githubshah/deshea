@@ -26,7 +26,7 @@ public class Main {
     TargetDataLine targetDataLine;
     AudioInputStream inputStream;
     SourceDataLine sourceLine;
-    Map<String, Integer> connectedClientsMap = new HashMap();
+    Map<String, Integer> connectedClientsMap = new HashMap(); // [ip , port]
 
     private AudioFormat getAudioFormat() {
         float sampleRate = 8000.0F;
@@ -48,22 +48,18 @@ public class Main {
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 udpServerSocket.receive(receivePacket);
                 try {
-                    byte[] audioData = new byte[4096];
-                    audioData = receivePacket.getData();
                     int callerPort = receivePacket.getPort();
                     InetAddress callerInetAddress = receivePacket.getAddress();
                     String callerIp = callerInetAddress.getHostAddress();
 
-                    if (!connectedClientsMap.containsKey(callerIp)) {
+                    if (!connectedClientsMap.containsKey(callerIp) || callerPort != connectedClientsMap.get(callerIp)) {
                         System.out.println("New Client Connected : " +
                             callerIp + ":" + receivePacket.getPort());
                         connectedClientsMap.put(callerIp, callerPort);
                     }
 
-                    //this.playHere(audioData);
-                    byte[] finalAudioData = audioData;
                     new Thread(() -> {
-                        this.sendToClient(connectedClientsMap, finalAudioData, callerIp, callerPort);
+                        this.sendToClient(connectedClientsMap, receivePacket, callerIp, callerPort);
                     }).start();
                 } catch (Exception e) {
                     System.out.println(e);
@@ -77,18 +73,20 @@ public class Main {
 
     /**
      * @param connectedClientsMap: [callerIp,callerPort]
-     * @param audioData
+     *                             //* @param audioData
      * @param callerIp:            caller ip
      * @param callerPort:          caller port
      */
-    private void sendToClient(Map<String, Integer> connectedClientsMap, byte[] audioData, String callerIp, int callerPort) {
+    private void sendToClient(Map<String, Integer> connectedClientsMap, DatagramPacket receivePacket, String callerIp, int callerPort) {
         System.out.println("Connected User count: " + connectedClientsMap.size());
         connectedClientsMap.forEach((connectedUserIp, connectedUserPort) -> {
             try {
                 if (!connectedUserIp.equals(callerIp)) { // skip local host client
+                    Thread.yield();
                     System.out.println("Packet send to ip: " + connectedUserIp + ", port: " + connectedUserPort);
                     DatagramPacket sendPacket =
-                        new DatagramPacket(audioData, audioData.length, InetAddress.getByName(connectedUserIp), connectedUserPort);
+                        new DatagramPacket(receivePacket.getData(),
+                            receivePacket.getData().length, InetAddress.getByName(connectedUserIp), connectedUserPort);
                     udpServerSocket.send(sendPacket);
                 }
             } catch (IOException e) {
