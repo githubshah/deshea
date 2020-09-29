@@ -169,9 +169,10 @@ public class Main {
 
             try {
                 System.out.println("Packet send to ip: " + destinationUserIp + ", port: " + destinationUserPort);
+                byte[] data = receivePacket.getData();
                 DatagramPacket sendPacket =
-                    new DatagramPacket(receivePacket.getData(),
-                        receivePacket.getData().length, InetAddress.getByName(destinationUserIp), destinationUserPort);
+                    new DatagramPacket(data, data.length, InetAddress.getByName(destinationUserIp), destinationUserPort);
+                Thread.yield();
                 udpServerSocket.send(sendPacket);
             } catch (IOException e) {
                 e.printStackTrace();
