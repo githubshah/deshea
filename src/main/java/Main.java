@@ -53,8 +53,9 @@ public class Main {
     DatagramSocket udpServerSocket;
 
     public void runVOIP() {
-        String shaidIp = "132.154.24.84";
+        String shaidIp = "47.31.148.71";
         String shaidIp2 = "132.154.66.61";
+        //String shaidIp3 = "47.31.148.71";
         roomToFrom.put(shaidIp, shaidIp2);
         roomFromTo.put(shaidIp2, shaidIp);
 
@@ -73,7 +74,7 @@ public class Main {
                     String kKey = getKKey(callerIp, callerPort);
 
                     System.out.println(kKey);
-                    System.out.println("get Key " + connectedClientsPortMap.get(kKey));
+                    //System.out.println("get Key " + connectedClientsPortMap.get(kKey));
                     if (!connectedClientsPortMap.containsKey(kKey)) {
                         System.out.println("New Client Connected : " +
                             callerIp + ":" + receivePacket.getPort());
