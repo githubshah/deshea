@@ -28,7 +28,7 @@ public class Main {
     }
 
     final int serverPort = 9786;
-    int dataPacketSize = 1024;
+    int dataPacketSize = 4096;
     ByteArrayOutputStream byteOutputStream;
     AudioFormat adFormat;
     TargetDataLine targetDataLine;
@@ -58,7 +58,7 @@ public class Main {
     DatagramSocket udpServerSocket;
 
     public void runVOIP() {
-        String shaidIp = "171.60.172.211";
+        String shaidIp = "61.0.18.38";
         String shaidIp2 = "132.154.66.61";
         //String shaidIp3 = "47.31.148.71";
         roomToFrom.put(shaidIp, shaidIp2);
