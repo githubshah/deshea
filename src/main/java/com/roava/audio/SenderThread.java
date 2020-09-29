@@ -1,7 +1,9 @@
 package com.roava.audio;
 
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -16,6 +18,18 @@ class SenderThread extends Thread {
     private boolean stopped = false;
     private int serverPort;
     private TargetDataLine micLine;
+
+    private AudioFormat getAudioFormat() {
+        AudioFormat.Encoding encoding = AudioFormat.Encoding.PCM_SIGNED;
+        float rate = 44100.0f;
+        int channels = 2;
+        int frameSize = 4;
+        int sampleSize = 16;
+        boolean bigEndian = true;
+
+        return new AudioFormat(encoding, rate, sampleSize, channels, (sampleSize / 8)
+            * channels, rate, bigEndian);
+    }
 
     //InetAddress IPAddress = InetAddress.getByName("192.168.1.3");
     public SenderThread(InetAddress serverIPAddress, int serverPort)
@@ -62,12 +76,19 @@ class SenderThread extends Thread {
         }
 
         boolean stopaudioCapture = false;
+
+        // play back the captured audio data
+        int frameSizeInBytes = getAudioFormat().getFrameSize();
+        int bufferLengthInFrames = micLine.getBufferSize() / 8;
+        int bufferLengthInBytes = bufferLengthInFrames * frameSizeInBytes;
+        byte[] data = new byte[bufferLengthInBytes];
+
         try {
             int cnt;
             while (!stopaudioCapture) {
-                cnt = micLine.read(tempBuffer, 0, 1024);
+                cnt = micLine.read(data, 0, bufferLengthInBytes);
                 if (cnt > 0) {
-                    DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, serverIPAddress, serverPort);
+                    DatagramPacket sendPacket = new DatagramPacket(data, bufferLengthInBytes, serverIPAddress, serverPort);
                     clientSenderSocket.send(sendPacket);
                     System.out.println(">>>>>> mic to server: " + serverIPAddress.getHostAddress() + ":" + serverPort);
                     Thread.yield();

@@ -15,6 +15,12 @@ public class Mic {
         try {
             adFormat = getAudioFormat();
             DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, adFormat);
+
+            if (!AudioSystem.isLineSupported(dataLineInfo)) {
+                System.out.println("not supported");
+                return;
+            }
+
             micLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
         } catch (Exception e) {
             StackTraceElement stackEle[] = e.getStackTrace();
@@ -26,17 +32,20 @@ public class Mic {
     }
 
     private AudioFormat getAudioFormat() {
-        float sampleRate = 8000.0F;
-        int sampleSizeInBits = 16;
-        int channels = 1;
-        boolean signed = true;
+        AudioFormat.Encoding encoding = AudioFormat.Encoding.PCM_SIGNED;
+        float rate = 44100.0f;
+        int channels = 2;
+        int frameSize = 4;
+        int sampleSize = 16;
         boolean bigEndian = true;
-        return new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+
+        return new AudioFormat(encoding, rate, sampleSize, channels, (sampleSize / 8)
+            * channels, rate, bigEndian);
     }
 
     public TargetDataLine openMicLine() throws LineUnavailableException {
         try {
-            micLine.open(adFormat);
+            micLine.open(adFormat, micLine.getBufferSize());
             this.micLine.start();
             return this.micLine;
         } catch (LineUnavailableException e) {

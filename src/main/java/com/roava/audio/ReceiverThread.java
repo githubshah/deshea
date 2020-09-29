@@ -50,12 +50,15 @@ class ReceiverThread extends Thread {
     }
 
     private AudioFormat getAudioFormat() {
-        float sampleRate = 8000.0F;
-        int sampleSizeInBits = 16;
-        int channels = 1;
-        boolean signed = true;
+        AudioFormat.Encoding encoding = AudioFormat.Encoding.PCM_SIGNED;
+        float rate = 44100.0f;
+        int channels = 2;
+        int frameSize = 4;
+        int sampleSize = 16;
         boolean bigEndian = true;
-        return new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+
+        return new AudioFormat(encoding, rate, sampleSize, channels, (sampleSize / 8)
+            * channels, rate, bigEndian);
     }
 
     public void run() {
