@@ -67,80 +67,82 @@ public class Main {
         try {
             udpServerSocket = new DatagramSocket(serverPort);
             System.out.println("Server started on port: " + serverPort);
-            while (true) {
-                byte[] receiveData = new byte[dataPacketSize];
-                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                udpServerSocket.receive(receivePacket);
-                try {
-                    int callerPort = receivePacket.getPort();
-                    InetAddress callerInetAddress = receivePacket.getAddress();
-                    String callerIp = callerInetAddress.getHostAddress();
-
-                    String kKey = getKKey(callerIp, callerPort);
-
-                    System.out.println(kKey);
-                    //System.out.println("get Key " + connectedClientsPortMap.get(kKey));
-                    if (!connectedClientsPortMap.containsKey(kKey)) {
-                        System.out.println("New Client Connected : " +
-                            callerIp + ":" + receivePacket.getPort());
-                        String code = new String(receivePacket.getData(), StandardCharsets.UTF_8);
-                        System.out.println("serverReply: " + code);
-                        connectedClientsPortMap.put(kKey, callerPort);
-                        connectedClientsIpMap.put(kKey, callerIp);
-
-                        if (code.contains(TYPE.SENDER.toString())) {
-                            if (ipSenderReceiverType_Port.containsKey(callerIp)) {
-                                System.out.println("1: " + code);
-                                ipSenderReceiverType_Port.get(callerIp).put(TYPE.SENDER, callerPort);
-                                ipSenderReceiverPort_Type.get(callerIp).put(callerPort, TYPE.SENDER);
-                            } else {
-                                System.out.println("2: " + code);
-                                Map<TYPE, Integer> ipPort = new HashMap<>();
-                                ipPort.put(TYPE.SENDER, callerPort);
-                                ipSenderReceiverType_Port.put(callerIp, ipPort);
-
-                                Map<Integer, TYPE> ipType = new HashMap<>();
-                                ipType.put(callerPort, TYPE.SENDER);
-                                ipSenderReceiverPort_Type.put(callerIp, ipType);
-                            }
-                        }
-                        if (code.contains(TYPE.RECEIVER.toString())) {
-                            if (ipSenderReceiverType_Port.containsKey(callerIp)) {
-                                System.out.println("3: " + code);
-                                ipSenderReceiverType_Port.get(callerIp).put(TYPE.RECEIVER, callerPort);
-                                ipSenderReceiverPort_Type.get(callerIp).put(callerPort, TYPE.RECEIVER);
-                            } else {
-                                System.out.println("4: " + code);
-                                Map<TYPE, Integer> ipPort = new HashMap<>();
-                                ipPort.put(TYPE.RECEIVER, callerPort);
-                                ipSenderReceiverType_Port.put(callerIp, ipPort);
-
-                                Map<Integer, TYPE> ipType = new HashMap<>();
-                                ipType.put(callerPort, TYPE.RECEIVER);
-                                ipSenderReceiverPort_Type.put(callerIp, ipType);
-                            }
-                        }
-                        Thread.sleep(200);
-
-                        ipSenderReceiverPort_Type.forEach((ip, m) -> {
-                            m.forEach((type, port) -> {
-                                System.out.println(ip + " : " + port + " : " + type);
-                            });
-                        });
-                    }
-
-                    executor.submit(()->{
-                        Thread.yield();
-                        this.sendToClient(connectedClientsIpMap, connectedClientsPortMap,
-                            receivePacket, callerIp, callerPort);
-                    });
-                } catch (Exception e) {
-                    System.out.println(e);
-                    System.exit(0);
-                }
-            }
+            connect();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+
+    private void connect() throws IOException {
+        while (true) {
+            byte[] receiveData = new byte[dataPacketSize];
+            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            udpServerSocket.receive(receivePacket);
+            try {
+                int callerPort = receivePacket.getPort();
+                InetAddress callerInetAddress = receivePacket.getAddress();
+                String callerIp = callerInetAddress.getHostAddress();
+
+                String kKey = getKKey(callerIp, callerPort);
+
+                System.out.println(kKey);
+                //System.out.println("get Key " + connectedClientsPortMap.get(kKey));
+                if (!connectedClientsPortMap.containsKey(kKey)) {
+                    System.out.println("New Client Connected : " +
+                        callerIp + ":" + receivePacket.getPort());
+                    String code = new String(receivePacket.getData(), StandardCharsets.UTF_8);
+                    System.out.println("serverReply: " + code);
+                    connectedClientsPortMap.put(kKey, callerPort);
+                    connectedClientsIpMap.put(kKey, callerIp);
+
+                    if (code.contains(TYPE.SENDER.toString())) {
+                        if (ipSenderReceiverType_Port.containsKey(callerIp)) {
+                            System.out.println("1: " + code);
+                            ipSenderReceiverType_Port.get(callerIp).put(TYPE.SENDER, callerPort);
+                            ipSenderReceiverPort_Type.get(callerIp).put(callerPort, TYPE.SENDER);
+                        } else {
+                            System.out.println("2: " + code);
+                            Map<TYPE, Integer> ipPort = new HashMap<>();
+                            ipPort.put(TYPE.SENDER, callerPort);
+                            ipSenderReceiverType_Port.put(callerIp, ipPort);
+
+                            Map<Integer, TYPE> ipType = new HashMap<>();
+                            ipType.put(callerPort, TYPE.SENDER);
+                            ipSenderReceiverPort_Type.put(callerIp, ipType);
+                        }
+                    }
+                    if (code.contains(TYPE.RECEIVER.toString())) {
+                        if (ipSenderReceiverType_Port.containsKey(callerIp)) {
+                            System.out.println("3: " + code);
+                            ipSenderReceiverType_Port.get(callerIp).put(TYPE.RECEIVER, callerPort);
+                            ipSenderReceiverPort_Type.get(callerIp).put(callerPort, TYPE.RECEIVER);
+                        } else {
+                            System.out.println("4: " + code);
+                            Map<TYPE, Integer> ipPort = new HashMap<>();
+                            ipPort.put(TYPE.RECEIVER, callerPort);
+                            ipSenderReceiverType_Port.put(callerIp, ipPort);
+
+                            Map<Integer, TYPE> ipType = new HashMap<>();
+                            ipType.put(callerPort, TYPE.RECEIVER);
+                            ipSenderReceiverPort_Type.put(callerIp, ipType);
+                        }
+                    }
+                    Thread.sleep(200);
+
+                    ipSenderReceiverPort_Type.forEach((ip, m) -> {
+                        m.forEach((type, port) -> {
+                            System.out.println(ip + " : " + port + " : " + type);
+                        });
+                    });
+                }
+
+                this.sendToClient(connectedClientsIpMap, connectedClientsPortMap,
+                    receivePacket, callerIp, callerPort);
+            } catch (Exception e) {
+                System.out.println(e);
+                System.exit(0);
+            }
         }
     }
 
@@ -179,7 +181,14 @@ public class Main {
                 DatagramPacket sendPacket =
                     new DatagramPacket(data, data.length, InetAddress.getByName(destinationUserIp), destinationUserPort);
                 //Thread.yield();
-                udpServerSocket.send(sendPacket);
+                executor.submit(()->{
+                    Thread.yield();
+                    try {
+                        udpServerSocket.send(sendPacket);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             } catch (IOException e) {
                 e.printStackTrace();
             }
