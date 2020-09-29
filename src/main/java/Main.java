@@ -40,7 +40,7 @@ public class Main {
     Map<String, Map<Integer, TYPE>> ipSenderReceiverPort_Type = new ConcurrentHashMap();  //[ip, [port, type]]
 
 
-    ExecutorService executor = Executors.newFixedThreadPool(10);//
+    ExecutorService executor = Executors.newFixedThreadPool(100);//
 
 
     Map<String, String> roomToFrom = new HashMap<>();
@@ -130,6 +130,7 @@ public class Main {
                     }
 
                     executor.submit(()->{
+                        Thread.yield();
                         this.sendToClient(connectedClientsIpMap, connectedClientsPortMap,
                             receivePacket, callerIp, callerPort);
                     });
