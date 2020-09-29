@@ -53,7 +53,7 @@ public class Main {
     DatagramSocket udpServerSocket;
 
     public void runVOIP() {
-        String shaidIp = "132.154.125.103";
+        String shaidIp = "132.154.24.84";
         String shaidIp2 = "132.154.66.61";
         roomToFrom.put(shaidIp, shaidIp2);
         roomFromTo.put(shaidIp2, shaidIp);
