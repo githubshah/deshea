@@ -26,7 +26,7 @@ public class Main {
     }
 
     final int serverPort = 9786;
-    int dataPacketSize = 4096;
+    int dataPacketSize = 1024;
     ByteArrayOutputStream byteOutputStream;
     AudioFormat adFormat;
     TargetDataLine targetDataLine;
@@ -172,7 +172,7 @@ public class Main {
                 byte[] data = receivePacket.getData();
                 DatagramPacket sendPacket =
                     new DatagramPacket(data, data.length, InetAddress.getByName(destinationUserIp), destinationUserPort);
-                Thread.yield();
+                //Thread.yield();
                 udpServerSocket.send(sendPacket);
             } catch (IOException e) {
                 e.printStackTrace();
