@@ -8,6 +8,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 class SenderThread extends Thread {
 
@@ -29,8 +31,8 @@ class SenderThread extends Thread {
             + this.serverIPAddress.getHostAddress() + ":" + this.serverPort);
         try {
             byte[] sendData = new byte[10];
-            sendData = "SENDER".getBytes( StandardCharsets.UTF_8 );
-            clientSenderSocket.send(new DatagramPacket(sendData,sendData.length));
+            sendData = "SENDER".getBytes(StandardCharsets.UTF_8);
+            clientSenderSocket.send(new DatagramPacket(sendData, sendData.length));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -46,7 +48,7 @@ class SenderThread extends Thread {
         return this.clientSenderSocket;
     }
 
-
+    ExecutorService executor = Executors.newFixedThreadPool(120);
 
     public void run() {
         byte tempBuffer[] = new byte[micLine.getBufferSize() / 5];
@@ -68,8 +70,15 @@ class SenderThread extends Thread {
                 cnt = micLine.read(tempBuffer, 0, 1024);
                 if (cnt > 0) {
                     DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, serverIPAddress, serverPort);
-                    clientSenderSocket.send(sendPacket);
-                    System.out.println(">>>>>> mic to server: " + serverIPAddress.getHostAddress() + ":" + serverPort);
+                    executor.submit(() -> {
+                        try {
+                            clientSenderSocket.send(sendPacket);
+                            System.out.println(">>>>>> mic to server: " + serverIPAddress.getHostAddress() + ":" + serverPort);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+
                     Thread.yield();
                 }
             }

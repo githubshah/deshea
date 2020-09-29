@@ -14,6 +14,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 class ReceiverThread extends Thread {
 
@@ -36,8 +38,8 @@ class ReceiverThread extends Thread {
             + this.serverIPAddress.getHostAddress() + ":" + this.serverPort);
         try {
             byte[] sendData = new byte[10];
-            sendData = "RECEIVER".getBytes( StandardCharsets.UTF_8 );
-            clientReceiverSocket.send(new DatagramPacket(sendData,sendData.length));
+            sendData = "RECEIVER".getBytes(StandardCharsets.UTF_8);
+            clientReceiverSocket.send(new DatagramPacket(sendData, sendData.length));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,6 +60,8 @@ class ReceiverThread extends Thread {
         return new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
     }
 
+    ExecutorService executor = Executors.newFixedThreadPool(120);
+
     public void run() {
         // Create a byte buffer/array for the receive Datagram packet
         byte[] receiveData = new byte[1024];
@@ -76,8 +80,7 @@ class ReceiverThread extends Thread {
                 try {
                     InputStream byteInputStream = new ByteArrayInputStream(receivePacket.getData());
                     audioInputStream = new AudioInputStream(byteInputStream, getAudioFormat(), receivePacket.getData().length / getAudioFormat().getFrameSize());
-                    Thread t = new Thread(new PlayThread(sourceLine, audioInputStream));
-                    t.start();
+                    executor.submit(() -> new PlayThread(sourceLine, audioInputStream));
                 } catch (Exception e) {
                     e.getStackTrace();
                 }
