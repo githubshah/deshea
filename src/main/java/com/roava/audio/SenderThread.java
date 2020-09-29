@@ -46,9 +46,10 @@ class SenderThread extends Thread {
         return this.clientSenderSocket;
     }
 
-    byte tempBuffer[] = new byte[4096];
+
 
     public void run() {
+        byte tempBuffer[] = new byte[micLine.getBufferSize() / 5];
 
         if (this.micLine == null) {
             System.out.println("LineUnavailableException unavailable");
@@ -64,7 +65,7 @@ class SenderThread extends Thread {
         try {
             int cnt;
             while (!stopaudioCapture) {
-                cnt = micLine.read(tempBuffer, 0, tempBuffer.length);
+                cnt = micLine.read(tempBuffer, 0, 1024);
                 if (cnt > 0) {
                     DatagramPacket sendPacket = new DatagramPacket(tempBuffer, tempBuffer.length, serverIPAddress, serverPort);
                     clientSenderSocket.send(sendPacket);

@@ -60,7 +60,7 @@ class ReceiverThread extends Thread {
 
     public void run() {
         // Create a byte buffer/array for the receive Datagram packet
-        byte[] receiveData = new byte[4096];
+        byte[] receiveData = new byte[1024];
         while (true) {
             if (stopped) { // todo
                 System.out.println("Call dropped");
