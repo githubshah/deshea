@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Main {
 
@@ -36,6 +38,9 @@ public class Main {
     Map<String, String> connectedClientsIpMap = new ConcurrentHashMap(); // [ip:port , ip]
     Map<String, Map<TYPE, Integer>> ipSenderReceiverType_Port = new ConcurrentHashMap();  //[ip, [type, port]]
     Map<String, Map<Integer, TYPE>> ipSenderReceiverPort_Type = new ConcurrentHashMap();  //[ip, [port, type]]
+
+
+    ExecutorService executor = Executors.newFixedThreadPool(10);//
 
 
     Map<String, String> roomToFrom = new HashMap<>();
@@ -124,10 +129,10 @@ public class Main {
                         });
                     }
 
-                    new Thread(() -> {
+                    executor.submit(()->{
                         this.sendToClient(connectedClientsIpMap, connectedClientsPortMap,
                             receivePacket, callerIp, callerPort);
-                    }).start();
+                    });
                 } catch (Exception e) {
                     System.out.println(e);
                     System.exit(0);
