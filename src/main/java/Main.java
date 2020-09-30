@@ -31,7 +31,7 @@ public class Main {
 
             new Thread(() -> {
                 try {
-                    Thread.sleep(60000);
+                    Thread.sleep(30000);
                     System.out.println("Byte stream closed");
                     byteArrayOutputStream.close();
                     //playAudio();
@@ -64,7 +64,7 @@ public class Main {
     }
 
     private void toFile() throws IOException {
-        File dstFile = new File("/shah/dst.wav");
+        File dstFile = new File("/home/ubuntu/shah/dst.wav");
         FileOutputStream out = new FileOutputStream(dstFile);
         byte audioData[] = byteArrayOutputStream.toByteArray();
         InputStream byteArrayInputStream = new ByteArrayInputStream(audioData);
