@@ -9,13 +9,13 @@ import javax.sound.sampled.TargetDataLine;
 public class Mic {
 
     private AudioFormat adFormat;
-    private TargetDataLine micLine;
+    private TargetDataLine targetDataLine;
 
     public Mic() {
         try {
             adFormat = getAudioFormat();
             DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, adFormat);
-            micLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
+            targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
         } catch (Exception e) {
             StackTraceElement stackEle[] = e.getStackTrace();
             for (StackTraceElement val : stackEle) {
@@ -36,9 +36,9 @@ public class Mic {
 
     public TargetDataLine openMicLine() throws LineUnavailableException {
         try {
-            micLine.open(adFormat);
-            this.micLine.start();
-            return this.micLine;
+            targetDataLine.open(adFormat);
+            this.targetDataLine.start();
+            return this.targetDataLine;
         } catch (LineUnavailableException e) {
             throw new LineUnavailableException();
         }

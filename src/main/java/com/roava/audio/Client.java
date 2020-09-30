@@ -35,10 +35,12 @@ public class Client {
 
         // Get the IP address of the local machine - we will use this as the address to send the data to
         InetAddress ia = InetAddress.getByName(host);
-        SenderThread sender = new SenderThread(ia, clientPort);
-        sender.start();
-        receiver = new ReceiverThread(ia, clientPort);
-        receiver.start();
+
+        new MySender().captureAudio();
+//        SenderThread sender = new SenderThread(ia, clientPort);
+//        sender.start();
+//        receiver = new ReceiverThread(ia, clientPort);
+//        receiver.start();
     }
 
     public void closeChannel() {
