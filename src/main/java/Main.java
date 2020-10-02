@@ -29,7 +29,7 @@ public class Main {
             byteArrayOutputStream = new ByteArrayOutputStream();
             byte[] tempBuffer = new byte[40000];
 
-            new Thread(() -> {
+            /*new Thread(() -> {
                 try {
                     Thread.sleep(20000);
                     System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
@@ -42,7 +42,7 @@ public class Main {
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
-            }).start();
+            }).start();*/
 
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
@@ -53,9 +53,9 @@ public class Main {
                 udpServerSocket.receive(receivePacket);
                 try {
                     System.out.println("write some thing");
-                    executor.execute(() -> {
+                    /*executor.execute(() -> {
                         byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
-                    });
+                    });*/
                 } catch (Exception e) {
                     System.out.println(e);
                     System.exit(0);
