@@ -27,17 +27,17 @@ public class Main {
             udpServerSocket = new DatagramSocket(serverPort);
             System.out.println("Server started on port: " + serverPort);
             byteArrayOutputStream = new ByteArrayOutputStream();
-            byte[] tempBuffer = new byte[10012];
+            byte[] tempBuffer = new byte[40000];
 
             new Thread(() -> {
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(20000);
                     System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
                     System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
                     System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
                     System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
                     byteArrayOutputStream.close();
-                    playAudio();
+                    //playAudio();
                     toFile();
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
@@ -67,8 +67,8 @@ public class Main {
     }
 
     private void toFile() throws IOException {
-        //File dstFile = new File("/home/ubuntu/shah/dst.wav");
-        File dstFile = new File("dst1.wav");
+        File dstFile = new File("/home/ubuntu/shah/dst.mp3");
+        //File dstFile = new File("dst1.mp3");
         FileOutputStream out = new FileOutputStream(dstFile);
         byte audioData[] = byteArrayOutputStream.toByteArray();
         InputStream byteArrayInputStream = new ByteArrayInputStream(audioData);
@@ -166,7 +166,8 @@ public class Main {
 
         //return new AudioFormat(44100.0f, 16, 2, true, true);
         //return new AudioFormat(44100.0f, 16, 2, true, false);
-        return new AudioFormat(8000.0f, 16, 1, true, true);
+        return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
+            44100.0F,16,2,2*2, 44100.0f,true);
     }//end getAudioFormat
 
     public static void main(String args[]) throws Exception {
