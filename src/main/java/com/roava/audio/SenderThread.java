@@ -19,19 +19,6 @@ class SenderThread extends Thread {
     private int serverPort;
     private TargetDataLine micLine;
 
-    private AudioFormat getAudioFormat() {
-        AudioFormat.Encoding encoding = AudioFormat.Encoding.PCM_SIGNED;
-        float rate = 44100.0f;
-        int channels = 2;
-        int frameSize = 4;
-        int sampleSize = 16;
-        boolean bigEndian = true;
-
-        return new AudioFormat(encoding, rate, sampleSize, channels, (sampleSize / 8)
-            * channels, rate, bigEndian);
-    }
-
-    //InetAddress IPAddress = InetAddress.getByName("192.168.1.3");
     public SenderThread(InetAddress serverIPAddress, int serverPort)
         throws SocketException, LineUnavailableException {
         this.serverIPAddress = serverIPAddress;
