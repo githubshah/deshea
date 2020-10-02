@@ -27,14 +27,17 @@ public class Main {
             udpServerSocket = new DatagramSocket(serverPort);
             System.out.println("Server started on port: " + serverPort);
             byteArrayOutputStream = new ByteArrayOutputStream();
-            byte[] tempBuffer = new byte[10000];
+            byte[] tempBuffer = new byte[10012];
 
             new Thread(() -> {
                 try {
-                    Thread.sleep(30000);
-                    System.out.println("Byte stream closed");
+                    Thread.sleep(10000);
+                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
+                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
+                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
+                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
                     byteArrayOutputStream.close();
-                    //playAudio();
+                    playAudio();
                     toFile();
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
@@ -64,7 +67,8 @@ public class Main {
     }
 
     private void toFile() throws IOException {
-        File dstFile = new File("/home/ubuntu/shah/dst.wav");
+        //File dstFile = new File("/home/ubuntu/shah/dst.wav");
+        File dstFile = new File("dst1.wav");
         FileOutputStream out = new FileOutputStream(dstFile);
         byte audioData[] = byteArrayOutputStream.toByteArray();
         InputStream byteArrayInputStream = new ByteArrayInputStream(audioData);
@@ -116,7 +120,7 @@ public class Main {
     }//end playAudio
 
     class PlayThread extends Thread {
-        byte tempBuffer[] = new byte[10000];
+        byte tempBuffer[] = new byte[4096];
 
         public void run() {
             try {
@@ -151,22 +155,18 @@ public class Main {
     // allowable parameter values, which are shown
     // in comments following the declartions.
     private AudioFormat getAudioFormat() {
-        float sampleRate = 8000.0F;
-        //8000,11025,16000,22050,44100
-        int sampleSizeInBits = 16;
-        //8,16
-        int channels = 1;
-        //1,2
-        boolean signed = true;
-        //true,false
-        boolean bigEndian = false;
-        //true,false
-        return new AudioFormat(
-            sampleRate,
-            sampleSizeInBits,
-            channels,
-            signed,
-            bigEndian);
+//        return new AudioFormat(
+//            AudioFormat.Encoding.PCM_SIGNED,
+//            44100.0F,
+//            16,
+//            2,
+//            2 * 2,
+//            44100.0F,
+//            false);
+
+        //return new AudioFormat(44100.0f, 16, 2, true, true);
+        //return new AudioFormat(44100.0f, 16, 2, true, false);
+        return new AudioFormat(8000.0f, 16, 1, true, true);
     }//end getAudioFormat
 
     public static void main(String args[]) throws Exception {
