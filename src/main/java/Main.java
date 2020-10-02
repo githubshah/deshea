@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -53,6 +57,9 @@ public class Main {
                 udpServerSocket.receive(receivePacket);
                 try {
                     System.out.println("write some thing");
+
+                    Client session = createOrGetSession(receivePacket);
+
                     /*executor.execute(() -> {
                         byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
                     });*/
@@ -64,6 +71,46 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    Map<String, Client> session = new HashMap<>();
+
+    private Client createOrGetSession(DatagramPacket receivePacket) {
+        Client client = null;
+        try {
+            int callerPort = receivePacket.getPort();
+            InetAddress callerInetAddress = receivePacket.getAddress();
+            String callerIp = callerInetAddress.getHostAddress();
+
+            if (session.containsKey(callerIp)) {
+                String code = new String(receivePacket.getData(), StandardCharsets.UTF_8);
+                if (code.contains(PortType.SENDER.toString())) {
+                    client = session.get(callerIp).setPort(callerPort, PortType.SENDER);
+                }
+                if (code.contains(PortType.RECEIVER.toString())) {
+                    client = session.get(callerIp).setPort(callerPort, PortType.RECEIVER);
+                }
+            } else {
+                String code = new String(receivePacket.getData(), StandardCharsets.UTF_8);
+                if (code.contains(PortType.SENDER.toString())) {
+                    client = new Client(callerIp, callerPort, PortType.SENDER);
+                }
+                if (code.contains(PortType.RECEIVER.toString())) {
+                    client = new Client(callerIp, callerPort, PortType.RECEIVER);
+                }
+                session.put(callerIp, client);
+                printAllSession();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return client;
+    }
+
+    private void printAllSession() {
+        session.forEach((key, value) -> {
+            System.out.println("ip: "+key + " ,mic: " + value.getMicPort() + " ,speaker: " + value.getSpeakerPort());
+        });
     }
 
     private void toFile() throws IOException {
@@ -167,7 +214,7 @@ public class Main {
         //return new AudioFormat(44100.0f, 16, 2, true, true);
         //return new AudioFormat(44100.0f, 16, 2, true, false);
         return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
-            44100.0F,16,2,2*2, 44100.0f,true);
+            44100.0F, 16, 2, 2 * 2, 44100.0f, true);
     }//end getAudioFormat
 
     public static void main(String args[]) throws Exception {
