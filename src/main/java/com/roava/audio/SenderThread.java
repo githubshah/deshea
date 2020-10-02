@@ -1,9 +1,11 @@
 package com.roava.audio;
 
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Mixer;
 import javax.sound.sampled.TargetDataLine;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -15,75 +17,69 @@ class SenderThread extends Thread {
 
     private InetAddress serverIPAddress;
     private DatagramSocket clientSenderSocket;
-    private boolean stopped = false;
     private int serverPort;
-    private TargetDataLine micLine;
+    private TargetDataLine targetDataLine;
 
     public SenderThread(InetAddress serverIPAddress, int serverPort)
         throws SocketException, LineUnavailableException {
+        //
+        Mixer.Info[] mixerInfo = AudioSystem.getMixerInfo();
+        System.out.println("Available mixers:");
+        for (int cnt = 0; cnt < mixerInfo.length; cnt++) {
+            System.out.println(mixerInfo[cnt].getName());
+        }//end for loop
+
+        AudioFormat audioFormat = UtilAudio.getAudioFormat();
+        DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
+        Mixer mixer = AudioSystem.getMixer(mixerInfo[0]);
+        targetDataLine = (TargetDataLine) mixer.getLine(dataLineInfo);
+        targetDataLine.open(audioFormat);
+        targetDataLine.start();
+        //
         this.serverIPAddress = serverIPAddress;
         this.serverPort = serverPort;
+
         // Create client DatagramSocket
         this.clientSenderSocket = new DatagramSocket();
         this.clientSenderSocket.connect(serverIPAddress, serverPort);
-        System.out.println("Sender Thread Connected to the server "
-            + this.serverIPAddress.getHostAddress() + ":" + this.serverPort);
+
+        // connect to server
+        this.requestToConnect();
+    }
+
+    private void requestToConnect() {
         try {
             byte[] sendData = new byte[10];
-            sendData = "SENDER".getBytes( StandardCharsets.UTF_8 );
-            clientSenderSocket.send(new DatagramPacket(sendData,sendData.length));
+            sendData = "SENDER".getBytes(StandardCharsets.UTF_8);
+            clientSenderSocket.send(new DatagramPacket(sendData, sendData.length));
+            System.out.println("Sender Thread Connected to the server "
+                + this.serverIPAddress.getHostAddress() + ":" + this.serverPort);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.micLine = new Mic().openMicLine();
-        System.out.println("Sender Thread Opened Mic");
     }
 
-    public void halt() {
-        this.stopped = true;
-    }
-
-    public DatagramSocket getSocket() {
-        return this.clientSenderSocket;
-    }
-
-
-
+    @Override
     public void run() {
-        byte tempBuffer[] = new byte[micLine.getBufferSize() / 5];
+        //An arbitrary-size temporary holding buffer
+        byte tempBuffer[] = new byte[UtilAudio.getBufferSize];
 
-        if (this.micLine == null) {
-            System.out.println("LineUnavailableException unavailable");
-            return;
-        }
-
-        if (this.clientSenderSocket == null) {
-            System.out.println("clientSenderSocket  unavailable");
-            return;
-        }
-
-        boolean stopaudioCapture = false;
-
-        // play back the captured audio data
-        int frameSizeInBytes = getAudioFormat().getFrameSize();
-        int bufferLengthInFrames = micLine.getBufferSize() / 8;
-        int bufferLengthInBytes = bufferLengthInFrames * frameSizeInBytes;
-        byte[] data = new byte[bufferLengthInBytes];
-
-        try {
-            int cnt;
-            while (!stopaudioCapture) {
-                cnt = micLine.read(data, 0, bufferLengthInBytes);
+        try {//Loop until stopCapture is set by
+            // another thread that services the Stop
+            // button.
+            while (true) {
+                //Read data from the internal buffer of
+                // the data line.
+                int cnt = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
                 if (cnt > 0) {
-                    DatagramPacket sendPacket = new DatagramPacket(data, bufferLengthInBytes, serverIPAddress, serverPort);
-                    clientSenderSocket.send(sendPacket);
-                    System.out.println(">>>>>> mic to server: " + serverIPAddress.getHostAddress() + ":" + serverPort);
-                    Thread.yield();
-                }
+                    System.out.println(tempBuffer.length == cnt);
+                    //send data to server
+                    clientSenderSocket.send(new DatagramPacket(tempBuffer, tempBuffer.length));
+                }//end if
             }
         } catch (Exception e) {
-            System.out.println("CaptureThread::run()" + e);
+            System.out.println(e);
             System.exit(0);
         }
     }
-}   
+}
