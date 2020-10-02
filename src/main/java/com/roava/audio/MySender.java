@@ -18,22 +18,18 @@ public class MySender {
     TargetDataLine targetDataLine;
 
     private AudioFormat getAudioFormat() {
-        float sampleRate = 8000.0F;
-        //8000,11025,16000,22050,44100
-        int sampleSizeInBits = 16;
-        //8,16
-        int channels = 1;
-        //1,2
-        boolean signed = true;
-        //true,false
-        boolean bigEndian = false;
-        //true,false
-        return new AudioFormat(
-            sampleRate,
-            sampleSizeInBits,
-            channels,
-            signed,
-            bigEndian);
+//        return new AudioFormat(
+//            AudioFormat.Encoding.PCM_SIGNED,
+//            44100.0F,
+//            16,
+//            2,
+//            2 * 2,
+//            44100.0F,
+//            false);
+
+        //return new AudioFormat(44100.0f, 16, 2, true, true);
+        return new AudioFormat(8000.0f, 16, 1, true, true);
+
     }//end getAudioFormat
 
     public void captureAudio() {
@@ -85,7 +81,7 @@ public class MySender {
             DatagramSocket clientSenderSocket = null;
             try {
                 clientSenderSocket = new DatagramSocket();
-                clientSenderSocket.connect(InetAddress.getByName("3.16.216.89"), 9786);
+                clientSenderSocket.connect(InetAddress.getByName("localhost"), 9786);
             } catch (SocketException e) {
                 e.printStackTrace();
             } catch (UnknownHostException e) {
