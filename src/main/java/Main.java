@@ -109,7 +109,7 @@ public class Main {
 
     private void printAllSession() {
         session.forEach((key, value) -> {
-            System.out.println("ip: "+key + " ,mic: " + value.getMicPort() + " ,speaker: " + value.getSpeakerPort());
+            System.out.println("ip: " + key + " ,mic: " + value.getMicPort() + " ,speaker: " + value.getSpeakerPort());
         });
     }
 
