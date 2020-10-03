@@ -16,14 +16,6 @@ public class Client {
         this.clientPort = port;
     }
 
-    public static void main(String args[]) throws Exception {
-        // The default port
-        int clientport = 9786;
-        String host = "34.66.62.184";
-        //String host = "localhost";
-        new Client(host, clientport).openChannel();
-    }
-
     ReceiverThread receiver;
 
     public void openChannel() throws UnknownHostException, SocketException, LineUnavailableException {
@@ -37,7 +29,7 @@ public class Client {
         InetAddress ia = InetAddress.getByName(host);
         SenderThread sender = new SenderThread(ia, clientPort);
         sender.start();
-        receiver = new ReceiverThread(ia, clientPort);
-        receiver.start();
+//        receiver = new ReceiverThread(ia, clientPort);
+//        receiver.start();
     }
 }
