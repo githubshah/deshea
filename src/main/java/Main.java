@@ -45,8 +45,8 @@ public class Main {
                     byteArrayOutputStream.close();
                     byteArrayOutputStream1.close();
                     //playAudio();
-                    toFile(byteArrayOutputStream, "fileName.mp3");
-                    toFile(byteArrayOutputStream, "fileName2.mp3");
+                    toFile(byteArrayOutputStream, "fn.mp3");
+                    toFile(byteArrayOutputStream, "fn1.mp3");
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
@@ -81,10 +81,10 @@ public class Main {
     }
 
     private void sendToClient(DatagramPacket receivePacket, byte[] tempBuffer) {
+        byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
+        byteArrayOutputStream1.write(tempBuffer, 0, tempBuffer.length);
         if (receivePacket.getAddress().getHostAddress().equals("117.253.23.81")) {
-            byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
         } else {
-            byteArrayOutputStream1.write(tempBuffer, 0, tempBuffer.length);
         }
 //        String callerAddress = receivePacket.getAddress().getHostAddress();
 //        session.forEach((ip, value) -> {
