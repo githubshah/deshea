@@ -33,20 +33,20 @@ public class Main {
             byteArrayOutputStream = new ByteArrayOutputStream();
             byte[] tempBuffer = new byte[40000];
 
-//            new Thread(() -> {
-//                try {
-//                    Thread.sleep(20000);
-//                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-//                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-//                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-//                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-//                    byteArrayOutputStream.close();
-//                    //playAudio();
-//                    toFile();
-//                } catch (InterruptedException | IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }).start();
+            new Thread(() -> {
+                try {
+                    Thread.sleep(20000);
+                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
+                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
+                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
+                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
+                    byteArrayOutputStream.close();
+                    //playAudio();
+                    toFile();
+                } catch (InterruptedException | IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
 
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
@@ -61,7 +61,6 @@ public class Main {
                     Client session = createOrGetSession(receivePacket);
 
                     executor.execute(() -> {
-                        //byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
                         sendToClient(receivePacket, tempBuffer);
                     });
                 } catch (Exception e) {
@@ -83,6 +82,7 @@ public class Main {
                     InetAddress inetIP = InetAddress.getByName(ip);
                     udpServerSocket.send(new DatagramPacket(tempBuffer, 0, tempBuffer.length, inetIP, targetPort));
                     System.out.println("packet sent to client: " + ip + " and port: " + targetPort);
+                    byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
