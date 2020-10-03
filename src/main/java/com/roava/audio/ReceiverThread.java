@@ -119,7 +119,7 @@ class ReceiverThread extends Thread {
         byte[] receiveData = new byte[UtilAudio.getBufferSize];
         AudioFormat audioFormat = UtilAudio.getAudioFormat();
         byteArrayOutputStream = new ByteArrayOutputStream();
-        StartRecording();
+        //StartRecording();
         while (true) {
             if (stopped) { // todo
                 return;
@@ -132,12 +132,12 @@ class ReceiverThread extends Thread {
                 System.out.println("waiting to receive data from server...");
                 clientReceiverSocket.receive(receivePacket);
                 try {
-                    byteArrayOutputStream.write(receiveData, 0, receiveData.length);
+                    //byteArrayOutputStream.write(receiveData, 0, receiveData.length);
 
-//                    InputStream byteInputStream = new ByteArrayInputStream(receivePacket.getData());
-//                    audioInputStream = new AudioInputStream(byteInputStream, audioFormat, receivePacket.getData().length / audioFormat.getFrameSize());
-//                    PlayThread playThread = new PlayThread();
-//                    playThread.start();
+                    InputStream byteInputStream = new ByteArrayInputStream(receivePacket.getData());
+                    audioInputStream = new AudioInputStream(byteInputStream, audioFormat, receivePacket.getData().length / audioFormat.getFrameSize());
+                    PlayThread playThread = new PlayThread();
+                    playThread.start();
                 } catch (Exception e) {
                     e.getStackTrace();
                 }
@@ -168,8 +168,8 @@ class ReceiverThread extends Thread {
                 }//end while
                 //Block and wait for internal buffer of the
                 // data line to empty.
-                sourceDataLine.drain();
-                sourceDataLine.close();
+                //sourceDataLine.drain();
+                //sourceDataLine.close();
             } catch (Exception e) {
                 System.out.println(e);
                 System.exit(0);
