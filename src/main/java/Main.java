@@ -52,9 +52,8 @@ public class Main {
                 }
             }).start();
 
-            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
             ThreadPoolExecutor executor1 = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
-
 
             while (true) {
                 DatagramPacket receivePacket = new DatagramPacket(tempBuffer, tempBuffer.length);
@@ -63,9 +62,9 @@ public class Main {
                 try {
                     System.out.println("write some thing");
 
-                    executor1.execute(() -> {
-                        Client session = createOrGetSession(receivePacket);
-                    });
+//                    executor1.execute(() -> {
+//                        Client session = createOrGetSession(receivePacket);
+//                    });
 
                     executor.execute(() -> {
                         sendToClient(receivePacket, tempBuffer);
@@ -82,7 +81,7 @@ public class Main {
 
     private void sendToClient(DatagramPacket receivePacket, byte[] tempBuffer) {
         byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
-        byteArrayOutputStream1.write(tempBuffer, 0, tempBuffer.length);
+        //byteArrayOutputStream1.write(tempBuffer, 0, tempBuffer.length);
         if (receivePacket.getAddress().getHostAddress().equals("117.253.23.81")) {
         } else {
         }
@@ -146,7 +145,6 @@ public class Main {
     private void toFile(ByteArrayOutputStream byteArrayOutputStream, String fileNem) throws IOException {
         //File dstFile = new File("/home/ubuntu/shah/dst.mp3");
         File dstFile = new File(fileNem);
-        FileOutputStream out = new FileOutputStream(dstFile);
         byte audioData[] = byteArrayOutputStream.toByteArray();
         InputStream byteArrayInputStream = new ByteArrayInputStream(audioData);
         AudioInputStream leftoutputAIS = new AudioInputStream(byteArrayInputStream, getAudioFormat(), audioData.length / getAudioFormat().getFrameSize());
