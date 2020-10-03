@@ -74,20 +74,20 @@ public class Main {
     }
 
     private void sendToClient(DatagramPacket receivePacket, byte[] tempBuffer) {
-        String callerAddress = receivePacket.getAddress().getHostAddress();
-        session.forEach((ip, value) -> {
-            if (!ip.equals(callerAddress)) {
-                int targetPort = value.getSpeakerPort();
-                try {
-                    InetAddress inetIP = InetAddress.getByName(ip);
-                    udpServerSocket.send(new DatagramPacket(tempBuffer, 0, tempBuffer.length, inetIP, targetPort));
-                    System.out.println("packet sent to client: " + ip + " and port: " + targetPort);
-                    byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
+//        String callerAddress = receivePacket.getAddress().getHostAddress();
+//        session.forEach((ip, value) -> {
+//            if (!ip.equals(callerAddress)) {
+//                int targetPort = value.getSpeakerPort();
+//                try {
+//                    InetAddress inetIP = InetAddress.getByName(ip);
+//                    udpServerSocket.send(new DatagramPacket(tempBuffer, 0, tempBuffer.length, inetIP, targetPort));
+//                    System.out.println("packet sent to client: " + ip + " and port: " + targetPort);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
     }
 
     Map<String, Client> session = new HashMap<>();
