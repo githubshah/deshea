@@ -19,7 +19,7 @@ class ReceiverThread extends Thread {
 
     private DatagramSocket clientReceiverSocket;
     private boolean stopped = false;
-    private SourceDataLine sourceLine;
+    private SourceDataLine sourceDataLine;
     private AudioInputStream audioInputStream;
     private int serverPort;
     private InetAddress serverIPAddress;
@@ -45,42 +45,27 @@ class ReceiverThread extends Thread {
         System.out.println("Sender Thread Opened Speaker");
     }
 
-    public void halt() {
-        this.stopped = true;
-    }
-
-    private AudioFormat getAudioFormat() {
-        AudioFormat.Encoding encoding = AudioFormat.Encoding.PCM_SIGNED;
-        float rate = 44100.0f;
-        int channels = 2;
-        int frameSize = 4;
-        int sampleSize = 16;
-        boolean bigEndian = true;
-
-        return new AudioFormat(encoding, rate, sampleSize, channels, (sampleSize / 8)
-            * channels, rate, bigEndian);
-    }
-
+    @Override
     public void run() {
         // Create a byte buffer/array for the receive Datagram packet
-        byte[] receiveData = new byte[1024];
+        byte[] receiveData = new byte[UtilAudio.getBufferSize];
+        AudioFormat audioFormat = UtilAudio.getAudioFormat();
         while (true) {
             if (stopped) { // todo
-                System.out.println("Call dropped");
                 return;
             }
             // Set up a DatagramPacket to receive the data into
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             try {
                 // Receive a packet from the server (blocks until the packets are received)
-                clientReceiverSocket.setSoTimeout(10000); // timeout 10 sec
+                //clientReceiverSocket.setSoTimeout(10000); // timeout 10 sec
                 System.out.println("waiting to receive data from server...");
                 clientReceiverSocket.receive(receivePacket);
                 try {
                     InputStream byteInputStream = new ByteArrayInputStream(receivePacket.getData());
-                    audioInputStream = new AudioInputStream(byteInputStream, getAudioFormat(), receivePacket.getData().length / getAudioFormat().getFrameSize());
-                    Thread t = new Thread(new PlayThread(sourceLine, audioInputStream));
-                    t.start();
+                    audioInputStream = new AudioInputStream(byteInputStream, audioFormat, receivePacket.getData().length / audioFormat.getFrameSize());
+                    PlayThread playThread = new PlayThread();
+                    playThread.start();
                 } catch (Exception e) {
                     e.getStackTrace();
                 }
@@ -91,11 +76,40 @@ class ReceiverThread extends Thread {
         }
     }
 
+    class PlayThread extends Thread {
+        byte tempBuffer[] = new byte[4096];
+
+        public void run() {
+            try {
+                int cnt;
+                //Keep looping until the input read method
+                // returns -1 for empty stream.
+                while ((cnt = audioInputStream.read(
+                    tempBuffer, 0,
+                    tempBuffer.length)) != -1) {
+                    if (cnt > 0) {
+                        //Write data to the internal buffer of
+                        // the data line where it will be
+                        // delivered to the speaker.
+                        sourceDataLine.write(tempBuffer, 0, cnt);
+                    }//end if
+                }//end while
+                //Block and wait for internal buffer of the
+                // data line to empty.
+                sourceDataLine.drain();
+                sourceDataLine.close();
+            } catch (Exception e) {
+                System.out.println(e);
+                System.exit(0);
+            }//end catch
+        }//end run
+    }//end inner class PlayThread
+
     private void openSpeaker() throws LineUnavailableException {
-        AudioFormat adFormat = getAudioFormat();
+        AudioFormat adFormat = UtilAudio.getAudioFormat();
         DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, adFormat);
-        sourceLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
-        sourceLine.open(adFormat);
-        sourceLine.start();
+        sourceDataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
+        sourceDataLine.open(adFormat);
+        sourceDataLine.start();
     }
 }
