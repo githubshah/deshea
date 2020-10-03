@@ -25,12 +25,14 @@ public class Main {
     final int serverPort = 9786;
     DatagramSocket udpServerSocket;
     ByteArrayOutputStream byteArrayOutputStream;
+    ByteArrayOutputStream byteArrayOutputStream1;
 
     public void runVOIP() {
         try {
             udpServerSocket = new DatagramSocket(serverPort);
             System.out.println("Server started on port: " + serverPort);
             byteArrayOutputStream = new ByteArrayOutputStream();
+            byteArrayOutputStream1 = new ByteArrayOutputStream();
             byte[] tempBuffer = new byte[40000];
 
             new Thread(() -> {
@@ -41,14 +43,17 @@ public class Main {
                     System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
                     System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
                     byteArrayOutputStream.close();
+                    byteArrayOutputStream1.close();
                     //playAudio();
-                    toFile();
+                    toFile(byteArrayOutputStream, "fileName.mp3");
+                    toFile(byteArrayOutputStream, "fileName2.mp3");
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
             }).start();
 
-            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
+            ThreadPoolExecutor executor1 = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
 
 
             while (true) {
@@ -58,7 +63,9 @@ public class Main {
                 try {
                     System.out.println("write some thing");
 
-                    Client session = createOrGetSession(receivePacket);
+                    executor1.execute(() -> {
+                        Client session = createOrGetSession(receivePacket);
+                    });
 
                     executor.execute(() -> {
                         sendToClient(receivePacket, tempBuffer);
@@ -74,7 +81,11 @@ public class Main {
     }
 
     private void sendToClient(DatagramPacket receivePacket, byte[] tempBuffer) {
-        byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
+        if (receivePacket.getAddress().getHostAddress().equals("117.253.23.81")) {
+            byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
+        } else {
+            byteArrayOutputStream1.write(tempBuffer, 0, tempBuffer.length);
+        }
 //        String callerAddress = receivePacket.getAddress().getHostAddress();
 //        session.forEach((ip, value) -> {
 //            if (!ip.equals(callerAddress)) {
@@ -115,8 +126,10 @@ public class Main {
                 if (code.contains(PortType.RECEIVER.toString())) {
                     client = new Client(callerIp, callerPort, PortType.RECEIVER);
                 }
-                session.put(callerIp, client);
-                printAllSession();
+                if (client != null) {
+                    session.put(callerIp, client);
+                    printAllSession();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,15 +143,14 @@ public class Main {
         });
     }
 
-    private void toFile() throws IOException {
-        File dstFile = new File("/home/ubuntu/shah/dst.mp3");
-        //File dstFile = new File("dst1.mp3");
+    private void toFile(ByteArrayOutputStream byteArrayOutputStream, String fileNem) throws IOException {
+        //File dstFile = new File("/home/ubuntu/shah/dst.mp3");
+        File dstFile = new File(fileNem);
         FileOutputStream out = new FileOutputStream(dstFile);
         byte audioData[] = byteArrayOutputStream.toByteArray();
         InputStream byteArrayInputStream = new ByteArrayInputStream(audioData);
         AudioInputStream leftoutputAIS = new AudioInputStream(byteArrayInputStream, getAudioFormat(), audioData.length / getAudioFormat().getFrameSize());
         AudioSystem.write(leftoutputAIS, AudioFileFormat.Type.WAVE, dstFile);
-
     }
 
     AudioInputStream audioInputStream;
