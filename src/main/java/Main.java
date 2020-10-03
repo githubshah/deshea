@@ -60,24 +60,16 @@ public class Main {
 
     private void sendToClient(DatagramPacket receivePacket, byte[] tempBuffer) {
         System.out.println("recoding...");
-        byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
+        //byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
         //byteArrayOutputStream1.write(tempBuffer, 0, tempBuffer.length);
-        if (receivePacket.getAddress().getHostAddress().equals("117.253.23.81")) {
-        } else {
+        int speakerPort = session.get("127.0.0.1").getSpeakerPort();
+        try {
+            System.out.println("data sent back to client");
+            udpServerSocket.send(new DatagramPacket(tempBuffer, 0,
+                tempBuffer.length, receivePacket.getAddress(), speakerPort));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-//        String callerAddress = receivePacket.getAddress().getHostAddress();
-//        session.forEach((ip, value) -> {
-//            if (!ip.equals(callerAddress)) {
-//                int targetPort = value.getSpeakerPort();
-//                try {
-//                    InetAddress inetIP = InetAddress.getByName(ip);
-//                    udpServerSocket.send(new DatagramPacket(tempBuffer, 0, tempBuffer.length, inetIP, targetPort));
-//                    System.out.println("packet sent to client: " + ip + " and port: " + targetPort);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
     }
 
     Map<String, Client> session = new HashMap<>();
@@ -98,8 +90,8 @@ public class Main {
                     client = session.get(callerIp).setPort(callerPort, PortType.RECEIVER);
                 }
             } else {
-                StartRecording();
-                System.out.println("StartRecoding...");
+                //StartRecording();
+                //System.out.println("StartRecoding...");
 
                 String code = new String(receivePacket.getData(), StandardCharsets.UTF_8);
                 if (code.contains(PortType.SENDER.toString())) {
