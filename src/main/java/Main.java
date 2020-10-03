@@ -8,7 +8,6 @@ import javax.sound.sampled.SourceDataLine;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
@@ -25,35 +24,15 @@ public class Main {
     final int serverPort = 9786;
     DatagramSocket udpServerSocket;
     ByteArrayOutputStream byteArrayOutputStream;
-    ByteArrayOutputStream byteArrayOutputStream1;
 
     public void runVOIP() {
         try {
             udpServerSocket = new DatagramSocket(serverPort);
             System.out.println("Server started on port: " + serverPort);
             byteArrayOutputStream = new ByteArrayOutputStream();
-            byteArrayOutputStream1 = new ByteArrayOutputStream();
             byte[] tempBuffer = new byte[40000];
-
-            new Thread(() -> {
-                try {
-                    Thread.sleep(20000);
-                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-                    System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-                    byteArrayOutputStream.close();
-                    byteArrayOutputStream1.close();
-                    //playAudio();
-                    toFile(byteArrayOutputStream, "fn.mp3");
-                    toFile(byteArrayOutputStream, "fn1.mp3");
-                } catch (InterruptedException | IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-            ThreadPoolExecutor executor1 = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
+            ThreadPoolExecutor executor1 = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
             while (true) {
                 DatagramPacket receivePacket = new DatagramPacket(tempBuffer, tempBuffer.length);
@@ -62,9 +41,9 @@ public class Main {
                 try {
                     System.out.println("write some thing");
 
-//                    executor1.execute(() -> {
-//                        Client session = createOrGetSession(receivePacket);
-//                    });
+                    executor1.execute(() -> {
+                        Client session = createOrGetSession(receivePacket);
+                    });
 
                     executor.execute(() -> {
                         sendToClient(receivePacket, tempBuffer);
@@ -80,6 +59,7 @@ public class Main {
     }
 
     private void sendToClient(DatagramPacket receivePacket, byte[] tempBuffer) {
+        System.out.println("recoding...");
         byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
         //byteArrayOutputStream1.write(tempBuffer, 0, tempBuffer.length);
         if (receivePacket.getAddress().getHostAddress().equals("117.253.23.81")) {
@@ -118,6 +98,9 @@ public class Main {
                     client = session.get(callerIp).setPort(callerPort, PortType.RECEIVER);
                 }
             } else {
+                StartRecording();
+                System.out.println("StartRecoding...");
+
                 String code = new String(receivePacket.getData(), StandardCharsets.UTF_8);
                 if (code.contains(PortType.SENDER.toString())) {
                     client = new Client(callerIp, callerPort, PortType.SENDER);
@@ -136,6 +119,23 @@ public class Main {
         return client;
     }
 
+    private void StartRecording() {
+        new Thread(() -> {
+            try {
+                Thread.sleep(20000);
+                System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
+                System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
+                System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
+                System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
+                byteArrayOutputStream.close();
+                //playAudio();
+                toFile(byteArrayOutputStream, "fn.mp3");
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
     private void printAllSession() {
         session.forEach((key, value) -> {
             System.out.println("ip: " + key + " ,mic: " + value.getMicPort() + " ,speaker: " + value.getSpeakerPort());
@@ -144,6 +144,7 @@ public class Main {
 
     private void toFile(ByteArrayOutputStream byteArrayOutputStream, String fileNem) throws IOException {
         //File dstFile = new File("/home/ubuntu/shah/dst.mp3");
+        System.out.println("Going to create file");
         File dstFile = new File(fileNem);
         byte audioData[] = byteArrayOutputStream.toByteArray();
         InputStream byteArrayInputStream = new ByteArrayInputStream(audioData);
