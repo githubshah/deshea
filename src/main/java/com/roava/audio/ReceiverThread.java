@@ -60,6 +60,42 @@ class ReceiverThread extends Thread {
         AudioSystem.write(leftoutputAIS, AudioFileFormat.Type.WAVE, dstFile);
     }
 
+
+    private void playAudio() {
+        try {
+            //Get everything set up for playback.
+            //Get the previously-saved data into a byte
+            // array object.
+            byte audioData[] = byteArrayOutputStream.toByteArray();
+            //Get an input stream on the byte array
+            // containing the data
+            InputStream byteArrayInputStream =
+                new ByteArrayInputStream(audioData);
+            AudioFormat audioFormat = UtilAudio.getAudioFormat();
+            audioInputStream = new AudioInputStream(byteArrayInputStream, audioFormat,
+                audioData.length / audioFormat.
+                    getFrameSize());
+            DataLine.Info dataLineInfo =
+                new DataLine.Info(
+                    SourceDataLine.class,
+                    audioFormat);
+            sourceDataLine = (SourceDataLine)
+                AudioSystem.getLine(dataLineInfo);
+            sourceDataLine.open(audioFormat);
+            sourceDataLine.start();
+
+            //Create a thread to play back the data and
+            // start it  running.  It will run until
+            // all the data has been played back.
+            System.out.println("Going to play sound...");
+            Thread playThread = new PlayThread();
+            playThread.start();
+        } catch (Exception e) {
+            System.out.println(e);
+            System.exit(0);
+        }//end catch
+    }//end playAudio
+
     private void StartRecording() {
         new Thread(() -> {
             try {
@@ -69,8 +105,8 @@ class ReceiverThread extends Thread {
                 System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
                 System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
                 byteArrayOutputStream.close();
-                //playAudio();
-                toFile(byteArrayOutputStream, "fn.mp3");
+                //toFile(byteArrayOutputStream, "fn.mp3");
+                playAudio();
             } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
@@ -113,7 +149,7 @@ class ReceiverThread extends Thread {
     }
 
     class PlayThread extends Thread {
-        byte tempBuffer[] = new byte[4096];
+        byte tempBuffer[] = new byte[UtilAudio.getBufferSize];
 
         public void run() {
             try {
