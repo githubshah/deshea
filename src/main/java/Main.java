@@ -62,7 +62,8 @@ public class Main {
         System.out.println("recoding...");
         //byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
         //byteArrayOutputStream1.write(tempBuffer, 0, tempBuffer.length);
-        int speakerPort = session.get("132.154.242.243").getSpeakerPort();
+        //int speakerPort = session.get("132.154.242.243").getSpeakerPort();
+        int speakerPort = session.get("127.0.0.1").getSpeakerPort();
         try {
             System.out.println("data sent back to client: "+speakerPort);
             udpServerSocket.send(new DatagramPacket(tempBuffer, 0,
