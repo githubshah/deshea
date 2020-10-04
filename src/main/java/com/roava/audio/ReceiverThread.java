@@ -17,6 +17,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 class ReceiverThread extends Thread {
 
@@ -113,6 +115,8 @@ class ReceiverThread extends Thread {
         }).start();
     }
 
+    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(50);
+
     @Override
     public void run() {
         // Create a byte buffer/array for the receive Datagram packet
@@ -136,8 +140,34 @@ class ReceiverThread extends Thread {
 
                     InputStream byteInputStream = new ByteArrayInputStream(receivePacket.getData());
                     audioInputStream = new AudioInputStream(byteInputStream, audioFormat, receivePacket.getData().length / audioFormat.getFrameSize());
-                    PlayThread playThread = new PlayThread();
-                    playThread.start();
+                    executor.execute(()->{
+                        byte tempBuffer[] = new byte[UtilAudio.getBufferSize];
+
+                        try {
+                            int cnt;
+                            //Keep looping until the input read method
+                            // returns -1 for empty stream.
+                            while ((cnt = audioInputStream.read(
+                                tempBuffer, 0,
+                                tempBuffer.length)) != -1) {
+                                if (cnt > 0) {
+                                    //Write data to the internal buffer of
+                                    // the data line where it will be
+                                    // delivered to the speaker.
+                                    sourceDataLine.write(tempBuffer, 0, cnt);
+                                }//end if
+                            }//end while
+                            //Block and wait for internal buffer of the
+                            // data line to empty.
+                            //sourceDataLine.drain();
+                            //sourceDataLine.close();
+                        } catch (Exception e) {
+                            System.out.println(e);
+                            System.exit(0);
+                        }//end catch
+                    });
+//                    PlayThread playThread = new PlayThread();
+//                    playThread.start();
                 } catch (Exception e) {
                     e.getStackTrace();
                 }
