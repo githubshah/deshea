@@ -1,19 +1,11 @@
 
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.SourceDataLine;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -45,12 +37,14 @@ public class Main {
                         Client session = createOrGetSession(receivePacket);
                     });
 
+                    byte[] data = Arrays.copyOf(tempBuffer, tempBuffer.length);
+                    InetAddress callerAddress = receivePacket.getAddress();
                     executor.execute(() -> {
-                        sendToClient(receivePacket, tempBuffer);
+                        sendToClient(callerAddress, data);
                     });
                 } catch (Exception e) {
                     System.out.println(e);
-                    System.exit(0);
+                    //System.exit(0);
                 }
             }
         } catch (Exception e) {
@@ -58,16 +52,39 @@ public class Main {
         }
     }
 
-    private void sendToClient(DatagramPacket receivePacket, byte[] tempBuffer) {
-        System.out.println("recoding...");
+    private void sendToClient(InetAddress callerAddress, byte[] data) {
         //int speakerPort = session.get("132.154.242.243").getSpeakerPort();
-        int speakerPort = session.get("127.0.0.1").getSpeakerPort();
-        try {
-            System.out.println("data sent back to client: "+speakerPort);
-            udpServerSocket.send(new DatagramPacket(tempBuffer, 0,
-                tempBuffer.length, receivePacket.getAddress(), speakerPort));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (session.size() == 1) {
+            if (session.containsKey("127.0.0.1")) {
+                try {
+                    int speakerPort = session.get("127.0.0.1").getSpeakerPort();
+                    System.out.println("data sent back to localhost: " + callerAddress.getHostAddress() + ":" + speakerPort);
+                    udpServerSocket.send(new DatagramPacket(data, 0, data.length, callerAddress, speakerPort));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                try {
+                    int speakerPort = session.get(callerAddress.getHostAddress()).getSpeakerPort();
+                    System.out.println("data sent back to caller: " + callerAddress.getHostAddress() + ":" + speakerPort);
+                    udpServerSocket.send(new DatagramPacket(data, 0, data.length, callerAddress, speakerPort));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            session.forEach((ip, client) -> {
+                if (!ip.equals(callerAddress.getHostAddress())) { // broadcast packet
+                    int destSpeakerPort = session.get(ip).getSpeakerPort();
+                    try {
+                        System.out.println("data sent to client: " + ip + ":" + destSpeakerPort);
+                        udpServerSocket.send(new DatagramPacket(
+                            data, 0, data.length, InetAddress.getByName(ip), destSpeakerPort));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 
