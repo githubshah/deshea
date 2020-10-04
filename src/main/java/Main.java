@@ -34,7 +34,7 @@ public class Main {
                     System.out.println("write some thing");
 
                     executor1.execute(() -> {
-                        Client session = createOrGetSession(receivePacket);
+                        createOrGetSession(receivePacket);
                     });
 
                     byte[] data = Arrays.copyOf(tempBuffer, tempBuffer.length);
@@ -53,7 +53,6 @@ public class Main {
     }
 
     private void sendToClient(InetAddress callerAddress, byte[] data) {
-        //int speakerPort = session.get("132.154.242.243").getSpeakerPort();
         if (session.size() == 1) {
             if (session.containsKey("127.0.0.1")) {
                 try {
@@ -63,7 +62,7 @@ public class Main {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }else{
+            } else {
                 try {
                     int speakerPort = session.get(callerAddress.getHostAddress()).getSpeakerPort();
                     System.out.println("data sent back to caller: " + callerAddress.getHostAddress() + ":" + speakerPort);
