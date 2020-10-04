@@ -60,8 +60,6 @@ public class Main {
 
     private void sendToClient(DatagramPacket receivePacket, byte[] tempBuffer) {
         System.out.println("recoding...");
-        //byteArrayOutputStream.write(tempBuffer, 0, tempBuffer.length);
-        //byteArrayOutputStream1.write(tempBuffer, 0, tempBuffer.length);
         //int speakerPort = session.get("132.154.242.243").getSpeakerPort();
         int speakerPort = session.get("127.0.0.1").getSpeakerPort();
         try {
@@ -112,131 +110,11 @@ public class Main {
         return client;
     }
 
-    private void StartRecording() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(20000);
-                System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-                System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-                System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-                System.out.println(">>>>>>>>>>>>>>>>>>Byte stream closed");
-                byteArrayOutputStream.close();
-                //playAudio();
-                toFile(byteArrayOutputStream, "fn.mp3");
-            } catch (InterruptedException | IOException e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
     private void printAllSession() {
         session.forEach((key, value) -> {
             System.out.println("ip: " + key + " ,mic: " + value.getMicPort() + " ,speaker: " + value.getSpeakerPort());
         });
     }
-
-    private void toFile(ByteArrayOutputStream byteArrayOutputStream, String fileNem) throws IOException {
-        //File dstFile = new File("/home/ubuntu/shah/dst.mp3");
-        System.out.println("Going to create file");
-        File dstFile = new File(fileNem);
-        byte audioData[] = byteArrayOutputStream.toByteArray();
-        InputStream byteArrayInputStream = new ByteArrayInputStream(audioData);
-        AudioInputStream leftoutputAIS = new AudioInputStream(byteArrayInputStream, getAudioFormat(), audioData.length / getAudioFormat().getFrameSize());
-        AudioSystem.write(leftoutputAIS, AudioFileFormat.Type.WAVE, dstFile);
-    }
-
-    AudioInputStream audioInputStream;
-    SourceDataLine sourceDataLine;
-
-    //This method plays back the audio data that
-    // has been saved in the ByteArrayOutputStream
-    private void playAudio() {
-        try {
-            //Get everything set up for playback.
-            //Get the previously-saved data into a byte
-            // array object.
-            byte audioData[] = byteArrayOutputStream.
-                toByteArray();
-            //Get an input stream on the byte array
-            // containing the data
-            InputStream byteArrayInputStream =
-                new ByteArrayInputStream(audioData);
-            AudioFormat audioFormat = getAudioFormat();
-            audioInputStream = new AudioInputStream(
-                byteArrayInputStream,
-                audioFormat,
-                audioData.length / audioFormat.
-                    getFrameSize());
-            DataLine.Info dataLineInfo =
-                new DataLine.Info(
-                    SourceDataLine.class,
-                    audioFormat);
-            sourceDataLine = (SourceDataLine)
-                AudioSystem.getLine(dataLineInfo);
-            sourceDataLine.open(audioFormat);
-            sourceDataLine.start();
-
-            //Create a thread to play back the data and
-            // start it  running.  It will run until
-            // all the data has been played back.
-            Thread playThread = new PlayThread();
-            playThread.start();
-        } catch (Exception e) {
-            System.out.println(e);
-            System.exit(0);
-        }//end catch
-    }//end playAudio
-
-    class PlayThread extends Thread {
-        byte tempBuffer[] = new byte[4096];
-
-        public void run() {
-            try {
-                int cnt;
-                //Keep looping until the input read method
-                // returns -1 for empty stream.
-                while ((cnt = audioInputStream.read(
-                    tempBuffer, 0,
-                    tempBuffer.length)) != -1) {
-                    if (cnt > 0) {
-                        //Write data to the internal buffer of
-                        // the data line where it will be
-                        // delivered to the speaker.
-                        sourceDataLine.write(tempBuffer, 0, cnt);
-                    }//end if
-                }//end while
-                //Block and wait for internal buffer of the
-                // data line to empty.
-                sourceDataLine.drain();
-                sourceDataLine.close();
-            } catch (Exception e) {
-                System.out.println(e);
-                System.exit(0);
-            }//end catch
-        }//end run
-    }//end inner class PlayThread
-
-    //This method creates and returns an
-    // AudioFormat object for a given set of format
-    // parameters.  If these parameters don't work
-    // well for you, try some of the other
-    // allowable parameter values, which are shown
-    // in comments following the declartions.
-    private AudioFormat getAudioFormat() {
-//        return new AudioFormat(
-//            AudioFormat.Encoding.PCM_SIGNED,
-//            44100.0F,
-//            16,
-//            2,
-//            2 * 2,
-//            44100.0F,
-//            false);
-
-        //return new AudioFormat(44100.0f, 16, 2, true, true);
-        //return new AudioFormat(44100.0f, 16, 2, true, false);
-        return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
-            44100.0F, 16, 2, 2 * 2, 44100.0f, true);
-    }//end getAudioFormat
 
     public static void main(String args[]) throws Exception {
         new Main().runVOIP();
