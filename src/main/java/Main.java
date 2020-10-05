@@ -28,15 +28,10 @@ public class Main {
 
             while (true) {
                 DatagramPacket receivePacket = new DatagramPacket(tempBuffer, tempBuffer.length);
-                System.out.println("Server waiting to retrieve: " + serverPort);
+                //System.out.println("Server waiting to retrieve: " + serverPort);
                 udpServerSocket.receive(receivePacket);
                 try {
-                    System.out.println("write some thing");
-
-                    executor1.execute(() -> {
-                        createOrGetSession(receivePacket);
-                    });
-
+                    createOrGetSession(receivePacket);
                     byte[] data = Arrays.copyOf(tempBuffer, tempBuffer.length);
                     InetAddress callerAddress = receivePacket.getAddress();
                     executor.execute(() -> {
@@ -58,7 +53,11 @@ public class Main {
                 try {
                     int speakerPort = session.get("127.0.0.1").getSpeakerPort();
                     System.out.println("data sent back to localhost: " + callerAddress.getHostAddress() + ":" + speakerPort);
-                    udpServerSocket.send(new DatagramPacket(data, 0, data.length, callerAddress, speakerPort));
+                    if (speakerPort != 0) {
+                        udpServerSocket.send(new DatagramPacket(data, 0, data.length, callerAddress, speakerPort));
+                    } else {
+                        System.out.println("No Speaker port available: " + callerAddress.getHostAddress() + ":" + speakerPort);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -66,7 +65,11 @@ public class Main {
                 try {
                     int speakerPort = session.get(callerAddress.getHostAddress()).getSpeakerPort();
                     System.out.println("data sent back to caller: " + callerAddress.getHostAddress() + ":" + speakerPort);
-                    udpServerSocket.send(new DatagramPacket(data, 0, data.length, callerAddress, speakerPort));
+                    if (speakerPort != 0) {
+                        udpServerSocket.send(new DatagramPacket(data, 0, data.length, callerAddress, speakerPort));
+                    } else {
+                        System.out.println("No Speaker port available: " + callerAddress.getHostAddress() + ":" + speakerPort);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -77,8 +80,12 @@ public class Main {
                     int destSpeakerPort = session.get(ip).getSpeakerPort();
                     try {
                         System.out.println("data sent to client: " + ip + ":" + destSpeakerPort);
-                        udpServerSocket.send(new DatagramPacket(
-                            data, 0, data.length, InetAddress.getByName(ip), destSpeakerPort));
+                        if (destSpeakerPort != 0) {
+                            udpServerSocket.send(new DatagramPacket(
+                                data, 0, data.length, InetAddress.getByName(ip), destSpeakerPort));
+                        } else {
+                            System.out.println("No Speaker port available: " + callerAddress.getHostAddress() + ":" + destSpeakerPort);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
