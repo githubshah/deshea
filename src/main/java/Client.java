@@ -7,7 +7,6 @@ public class Client {
     public Client(String ip, int port, PortType portType) {
         this.ip = ip;
         this.setPort(port, portType);
-        System.out.println(">>> SessionCreated IP : " + ip);
     }
 
     public Client setPort(int port, PortType portType) {
@@ -30,10 +29,10 @@ public class Client {
         ++connectedPort;
         if (connectedPort == 2) {
             ++connectedPort; // never call again
-            System.out.println("completely connected ip: " + ip + " ,mic: " + micPort + " ,speaker: " + speakerPort);
+            System.out.println(">>>>>>>>-> completely connected ip: " + ip + " ,mic: " + micPort + " ,speaker: " + speakerPort);
         }
         if (connectedPort < 2) {
-            System.out.println("partially connected ip: " + ip + " ,port: " + port + " ,portType: " + portType.toString());
+            System.out.println("<-<<<<<<<< partially connected ip: " + ip + " ,port: " + port + " ,portType: " + portType.toString());
         }
     }
 

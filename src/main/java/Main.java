@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class Main {
     public void runVOIP() {
         try {
             udpServerSocket = new DatagramSocket(serverPort);
-            System.out.println("Server started on port: " + serverPort);
+            System.out.println("Server started on " + serverPort);
             byteArrayOutputStream = new ByteArrayOutputStream();
             byte[] tempBuffer = new byte[40000];
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
@@ -28,8 +29,13 @@ public class Main {
 
             while (true) {
                 DatagramPacket receivePacket = new DatagramPacket(tempBuffer, tempBuffer.length);
-                //System.out.println("Server waiting to retrieve: " + serverPort);
-                udpServerSocket.receive(receivePacket);
+                try{
+                    udpServerSocket.setSoTimeout(1000);
+                    udpServerSocket.receive(receivePacket);
+                }catch (Exception e){
+                    System.out.println("drop waiting...");
+                    continue;
+                }
                 try {
                     createOrGetSession(receivePacket);
                     byte[] data = Arrays.copyOf(tempBuffer, tempBuffer.length);
@@ -52,11 +58,11 @@ public class Main {
             if (session.containsKey("127.0.0.1")) {
                 try {
                     int speakerPort = session.get("127.0.0.1").getSpeakerPort();
-                    System.out.println("data sent back to localhost: " + callerAddress.getHostAddress() + ":" + speakerPort);
                     if (speakerPort != 0) {
+                        System.out.println("data sent back to localhost: " + callerAddress.getHostAddress() + ":" + speakerPort);
                         udpServerSocket.send(new DatagramPacket(data, 0, data.length, callerAddress, speakerPort));
                     } else {
-                        System.out.println("No Speaker port available: " + callerAddress.getHostAddress() + ":" + speakerPort);
+                        System.out.println("Yet to be connect => No Speaker port available: " + callerAddress.getHostAddress() + ":" + speakerPort);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -64,11 +70,11 @@ public class Main {
             } else {
                 try {
                     int speakerPort = session.get(callerAddress.getHostAddress()).getSpeakerPort();
-                    System.out.println("data sent back to caller: " + callerAddress.getHostAddress() + ":" + speakerPort);
                     if (speakerPort != 0) {
+                        System.out.println("data sent back to caller: " + callerAddress.getHostAddress() + ":" + speakerPort);
                         udpServerSocket.send(new DatagramPacket(data, 0, data.length, callerAddress, speakerPort));
                     } else {
-                        System.out.println("No Speaker port available: " + callerAddress.getHostAddress() + ":" + speakerPort);
+                        System.out.println("Yet to be connect => No Speaker port available: " + callerAddress.getHostAddress() + ":" + speakerPort);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -79,12 +85,12 @@ public class Main {
                 if (!ip.equals(callerAddress.getHostAddress())) { // broadcast packet
                     int destSpeakerPort = session.get(ip).getSpeakerPort();
                     try {
-                        System.out.println("data sent to client: " + ip + ":" + destSpeakerPort);
                         if (destSpeakerPort != 0) {
+                            System.out.println("data sent to client: " + ip + ":" + destSpeakerPort);
                             udpServerSocket.send(new DatagramPacket(
                                 data, 0, data.length, InetAddress.getByName(ip), destSpeakerPort));
                         } else {
-                            System.out.println("No Speaker port available: " + callerAddress.getHostAddress() + ":" + destSpeakerPort);
+                            System.out.println("Yet to be connect => No Speaker port available: " + callerAddress.getHostAddress() + ":" + destSpeakerPort);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -124,7 +130,7 @@ public class Main {
                 }
                 if (client != null) {
                     session.put(callerIp, client);
-                    printAllSession();
+                    //printAllSession();
                 }
             }
         } catch (Exception e) {
