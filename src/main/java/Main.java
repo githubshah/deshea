@@ -30,7 +30,7 @@ public class Main {
             while (true) {
                 DatagramPacket receivePacket = new DatagramPacket(tempBuffer, tempBuffer.length);
                 try{
-                    udpServerSocket.setSoTimeout(1000);
+                    udpServerSocket.setSoTimeout(3000);
                     udpServerSocket.receive(receivePacket);
                 }catch (Exception e){
                     System.out.println("drop waiting...");
