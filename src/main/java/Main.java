@@ -30,13 +30,14 @@ public class Main {
             while (true) {
                 DatagramPacket receivePacket = new DatagramPacket(tempBuffer, tempBuffer.length);
                 try{
-                    udpServerSocket.setSoTimeout(5000);
+                    udpServerSocket.setSoTimeout(10000);
                     udpServerSocket.receive(receivePacket);
                 }catch (Exception e){
                     System.out.println("drop waiting...");
                     continue;
                 }
                 try {
+                    System.out.println("received msg...");
                     createOrGetSession(receivePacket);
                     byte[] data = Arrays.copyOf(tempBuffer, tempBuffer.length);
                     InetAddress callerAddress = receivePacket.getAddress();
