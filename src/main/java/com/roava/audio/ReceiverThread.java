@@ -37,8 +37,6 @@ class ReceiverThread extends Thread {
         this.clientReceiverSocket.connect(serverIPAddress, serverPort);
         System.out.println("Sender Thread Connected to the server "
             + this.serverIPAddress.getHostAddress() + ":" + this.serverPort);
-        System.out.println("Sender Thread Connected to the server "
-            + this.serverIPAddress.getHostAddress() + ":" + this.serverPort);
         try {
             byte[] sendData = new byte[10];
             sendData = "RECEIVER".getBytes(StandardCharsets.UTF_8);
@@ -134,7 +132,14 @@ class ReceiverThread extends Thread {
                 // Receive a packet from the server (blocks until the packets are received)
                 //clientReceiverSocket.setSoTimeout(10000); // timeout 10 sec
                 System.out.println("waiting to receive data from server...");
-                clientReceiverSocket.receive(receivePacket);
+                try{
+                    clientReceiverSocket.setSoTimeout(5000);
+                    clientReceiverSocket.receive(receivePacket);
+                }catch (Exception e){
+                    System.out.println("drop waiting...");
+                    continue;
+                }
+                //clientReceiverSocket.receive(receivePacket);
                 try {
                     //byteArrayOutputStream.write(receiveData, 0, receiveData.length);
 
@@ -171,7 +176,7 @@ class ReceiverThread extends Thread {
                 } catch (Exception e) {
                     e.getStackTrace();
                 }
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 System.err.println(ex);
             }
             Thread.yield();

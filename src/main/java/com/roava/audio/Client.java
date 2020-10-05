@@ -16,8 +16,6 @@ public class Client {
         this.clientPort = port;
     }
 
-    ReceiverThread receiver;
-
     public void openChannel() throws UnknownHostException, SocketException, LineUnavailableException {
         String host = ServerSetting.SERVER_IP;
         int clientPort = ServerSetting.SERVER_PORT;
@@ -29,7 +27,7 @@ public class Client {
         InetAddress ia = InetAddress.getByName(host);
         SenderThread sender = new SenderThread(ia, clientPort);
         sender.start();
-        receiver = new ReceiverThread(ia, clientPort);
+        ReceiverThread receiver = new ReceiverThread(ia, clientPort);
         receiver.start();
     }
 }
