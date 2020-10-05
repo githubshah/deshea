@@ -115,7 +115,7 @@ class ReceiverThread extends Thread {
         }).start();
     }
 
-    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(50);
+    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 
     @Override
     public void run() {
@@ -140,7 +140,7 @@ class ReceiverThread extends Thread {
 
                     InputStream byteInputStream = new ByteArrayInputStream(receivePacket.getData());
                     audioInputStream = new AudioInputStream(byteInputStream, audioFormat, receivePacket.getData().length / audioFormat.getFrameSize());
-                    executor.execute(()->{
+                    executor.execute(() -> {
                         byte tempBuffer[] = new byte[UtilAudio.getBufferSize];
 
                         try {
