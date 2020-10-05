@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class Main {
 
-    final int serverPort = 9786;
+    final int serverPort = 9785;
     DatagramSocket udpServerSocket;
     ByteArrayOutputStream byteArrayOutputStream;
 
