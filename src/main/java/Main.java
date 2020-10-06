@@ -1,4 +1,6 @@
 
+import video.ChatServer;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -147,6 +149,7 @@ public class Main {
     }
 
     public static void main(String args[]) throws Exception {
-        new Main().runVOIP();
+        //new Main().runVOIP();
+        new ChatServer(9898);
     }
 }
