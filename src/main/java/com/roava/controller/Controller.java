@@ -1,7 +1,8 @@
 package com.roava.controller;
 
-import com.roava.audio.Client;
+import com.roava.audio.AudioClient;
 import com.roava.config.ServerSetting;
+import com.roava.video.VideoClient;
 import com.roava.video.WebCam;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -27,9 +28,8 @@ public class Controller implements Initializable {
     @FXML
     void callOn(){
         System.out.println("callOn");
-        new WebCam(loggedUser).start();
         try {
-            new Client(ServerSetting.SERVER_IP, ServerSetting.SERVER_PORT).openChannel();
+            new VideoClient(ServerSetting.SERVER_IP, ServerSetting.SERVER_PORT, loggedUser).openChannel();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (SocketException e) {

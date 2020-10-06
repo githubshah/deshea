@@ -1,19 +1,17 @@
 package com.roava.audio;
 
 import com.roava.config.ServerSetting;
-import com.roava.video.VideoReceiverThread;
-import com.roava.video.VideoSenderThread;
 
 import javax.sound.sampled.LineUnavailableException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-public class Client {
+public class AudioClient {
     private String host;
     private int clientPort;
 
-    public Client(String host, int port) {
+    public AudioClient(String host, int port) {
         this.host = host;
         this.clientPort = port;
     }
@@ -27,15 +25,9 @@ public class Client {
 
         // Get the IP address of the local machine - we will use this as the address to send the data to
         InetAddress ia = InetAddress.getByName(host);
-//        AudioSenderThread sender = new AudioSenderThread(ia, clientPort);
-//        sender.start();
-//        AudioReceiverThread receiver = new AudioReceiverThread(ia, clientPort);
-//        receiver.start();
-
-
-        VideoSenderThread sender = new VideoSenderThread(ia, clientPort);
+        AudioSenderThread sender = new AudioSenderThread(ia, clientPort);
         sender.start();
-        VideoReceiverThread receiver = new VideoReceiverThread(ia, clientPort);
+        AudioReceiverThread receiver = new AudioReceiverThread(ia, clientPort);
         receiver.start();
     }
 }
