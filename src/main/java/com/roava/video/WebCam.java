@@ -19,6 +19,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class WebCam extends Thread {
     private static Mat frame = null;
@@ -26,6 +28,8 @@ public class WebCam extends Thread {
     private Timer tmrVideoProcess;
 
     private ImageView imageView;
+
+    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 
     @Override
     public void run() {
@@ -36,7 +40,7 @@ public class WebCam extends Thread {
         }
 
         frame = new Mat();
-        tmrVideoProcess = new Timer(1, new ActionListener() {
+        tmrVideoProcess = new Timer(5, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (!videoCapture.read(frame)) {
                     tmrVideoProcess.stop();
@@ -54,17 +58,29 @@ public class WebCam extends Thread {
                     }
                     if (dout != null) {
                         System.out.println("Ready to Send picture...");
-                        BufferedImage bImage = null;
-                        try {
-                            byte[] data = baos.toByteArray();
-                            dout.writeInt(data.length);
-                            if (data.length > 0) {
-                                dout.write(data, 0, data.length);
-                                System.out.println("Sent picture...");
+                        executor.execute(() -> {
+                            BufferedImage bImage = null;
+                            try {
+                                byte[] data = baos.toByteArray();
+
+//                                byte[] plain = new byte[10000];
+//                                byte[] compressed = compress(plain);
+//                                System.out.println(compressed.length); // 33
+//                                byte[] result = decompress(compressed);
+//                                System.out.println(result.length); // 10000
+
+
+
+                                dout.writeInt(data.length);
+                                if (data.length > 0) {
+                                    dout.write(data, 0, data.length);
+                                    System.out.println("Sent picture...");
+                                    baos.flush();
+                                }
+                            } catch (Exception exx) {
+                                exx.printStackTrace();
                             }
-                        } catch (Exception exx) {
-                            exx.printStackTrace();
-                        }
+                        });
                     }
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
