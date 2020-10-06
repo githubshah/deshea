@@ -181,7 +181,7 @@
                <children>
                   <Pane layoutY="-4.0" prefHeight="207.0" prefWidth="270.0">
                      <children>
-                        <ImageView fitHeight="187.0" fitWidth="262.0" layoutX="6.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="loggedUser" fitHeight="187.0" fitWidth="262.0" layoutX="6.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="/image/loggedUser.png" />
                            </image>

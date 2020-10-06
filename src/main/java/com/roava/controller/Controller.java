@@ -2,11 +2,12 @@ package com.roava.controller;
 
 import com.roava.audio.Client;
 import com.roava.config.ServerSetting;
+import com.roava.video.WebCam;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
 import javax.sound.sampled.LineUnavailableException;
-import javax.swing.*;
+import javafx.scene.image.ImageView;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -15,6 +16,8 @@ import java.util.ResourceBundle;
 public class Controller implements Initializable {
 
 
+    @FXML
+    ImageView loggedUser;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -24,6 +27,7 @@ public class Controller implements Initializable {
     @FXML
     void callOn(){
         System.out.println("callOn");
+        new WebCam(loggedUser).start();
         try {
             new Client(ServerSetting.SERVER_IP, ServerSetting.SERVER_PORT).openChannel();
         } catch (UnknownHostException e) {
@@ -38,5 +42,9 @@ public class Controller implements Initializable {
     @FXML
     void callOff(){
         System.out.println("callOff");
+    }
+
+    public ImageView getLoggedUserImageView() {
+        return this.loggedUser;
     }
 }

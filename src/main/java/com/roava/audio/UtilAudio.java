@@ -8,5 +8,5 @@ public class UtilAudio {
             44100.0F, 16, 2, 2 * 2, 44100.0f, true);
     }
 
-    final static int getBufferSize = 60000;
+    public final static int getBufferSize = 60000;
 }
