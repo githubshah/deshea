@@ -22,9 +22,5 @@ public class server {
         BufferedImage bImage2 = ImageIO.read(bis);
         ImageIO.write(bImage2, "png", new File("output.png") );
         System.out.println("image created");
-
-
-
-
     }
 }
