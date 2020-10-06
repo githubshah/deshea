@@ -150,6 +150,6 @@ public class Main {
 
     public static void main(String args[]) throws Exception {
         //new Main().runVOIP();
-        new ChatServer(9898);
+        new ChatServer(9898).execute();
     }
 }
