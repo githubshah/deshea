@@ -23,7 +23,7 @@ public class Main {
             udpServerSocket = new DatagramSocket(serverPort);
             System.out.println("Server started on " + serverPort);
             byteArrayOutputStream = new ByteArrayOutputStream();
-            byte[] tempBuffer = new byte[60000];
+            byte[] tempBuffer = new byte[200000];
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
             ThreadPoolExecutor executor1 = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
