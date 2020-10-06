@@ -37,6 +37,7 @@ public class VideoClient {
         webCam.start();
 
         Socket socket = new Socket("3.16.216.89", 9898);
+        //Socket socket = new Socket("127.0.0.1", 9898);
         webCam.populateInSocket(socket); // write thread
 
         new ReadThread(socket, this).start();

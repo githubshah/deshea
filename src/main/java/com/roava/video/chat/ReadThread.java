@@ -8,7 +8,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
- 
+import java.util.zip.DataFormatException;
+
 /**
  * This thread is responsible for reading server's input and printing it
  * to the console.

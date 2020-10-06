@@ -3,6 +3,7 @@ package com.roava.video;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import org.imgscalr.Scalr;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -31,6 +32,10 @@ public class WebCam extends Thread {
 
     ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 
+    BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws Exception {
+        return Scalr.resize(originalImage, Scalr.Method.AUTOMATIC, Scalr.Mode.AUTOMATIC, targetWidth, targetHeight, Scalr.OP_ANTIALIAS);
+    }
+
     @Override
     public void run() {
         videoCapture = new VideoCapture();
@@ -50,6 +55,14 @@ public class WebCam extends Thread {
                 BufferedImage img = null;
                 try {
                     img = Mat2bufferedImage(frame);
+
+                    try {
+                        img = resizeImage(img, 300, 300);
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+
+
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ImageIO.write(img, "jpg", baos);
                     Image image = SwingFXUtils.toFXImage(img, null);
@@ -59,18 +72,8 @@ public class WebCam extends Thread {
                     if (dout != null) {
                         System.out.println("Ready to Send picture...");
                         executor.execute(() -> {
-                            BufferedImage bImage = null;
                             try {
                                 byte[] data = baos.toByteArray();
-
-//                                byte[] plain = new byte[10000];
-//                                byte[] compressed = compress(plain);
-//                                System.out.println(compressed.length); // 33
-//                                byte[] result = decompress(compressed);
-//                                System.out.println(result.length); // 10000
-
-
-
                                 dout.writeInt(data.length);
                                 if (data.length > 0) {
                                     dout.write(data, 0, data.length);
