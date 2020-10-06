@@ -53,13 +53,6 @@ public class WebCam extends Thread {
                     if (imageView != null) {
                         imageView.setImage(image);
                     }
-
-                    if(clientSenderSocket!=null){
-                        System.out.println("Video packet send...");
-                        byte[] imageBytes = baos.toByteArray();
-                        System.out.println(imageBytes.length);
-                        clientSenderSocket.send(new DatagramPacket(imageBytes, imageBytes.length));
-                    }
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
