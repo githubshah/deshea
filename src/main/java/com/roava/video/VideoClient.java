@@ -1,37 +1,48 @@
 package com.roava.video;
 
 import com.roava.config.ServerSetting;
+import com.roava.video.chat.ReadThread;
 import javafx.scene.image.ImageView;
 
 import javax.sound.sampled.LineUnavailableException;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.io.IOException;
+import java.net.Socket;
 
 public class VideoClient {
     private String host;
     private int clientPort;
-    ImageView loggedUser;
 
-    public VideoClient(String host, int port, ImageView loggedUser) {
-        this.host = host;
-        this.clientPort = port;
-        this.loggedUser = loggedUser;
+    public ImageView getImageView() {
+        return imageView;
     }
 
-    public void openChannel() throws UnknownHostException, SocketException, LineUnavailableException {
+    ImageView imageView;
+
+    ImageView remoteUser;
+
+    public VideoClient(String host, int port, ImageView imageView, ImageView remoteUser) {
+        this.host = host;
+        this.clientPort = port;
+        this.imageView = imageView;
+        this.remoteUser = remoteUser;
+    }
+
+    public void openChannel() throws IOException, LineUnavailableException {
         String host = ServerSetting.SERVER_IP;
         int clientPort = ServerSetting.SERVER_PORT;
 
-        // Get the port number to use from the command line
-        System.out.println("Usage: UDPClient " + "Now using host = " + host + ", Port# = " + clientPort);
 
-        // Get the IP address of the local machine - we will use this as the address to send the data to
-        InetAddress ia = InetAddress.getByName(host);
+        WebCam webCam = new WebCam();
+        webCam.populateIn(imageView);
+        webCam.start();
 
-        VideoSenderThread sender = new VideoSenderThread(ia, clientPort, loggedUser);
-        sender.start();
-        VideoReceiverThread receiver = new VideoReceiverThread(ia, clientPort);
-        receiver.start();
+        Socket socket = new Socket("127.0.0.1", 9898);
+        webCam.populateInSocket(socket); // write thread
+
+        new ReadThread(socket, this).start();
+    }
+
+    public ImageView getRemoteUser() {
+        return remoteUser;
     }
 }

@@ -1,5 +1,9 @@
 package com.roava.video.chat;
 
+import com.roava.video.VideoClient;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -15,9 +19,9 @@ import java.net.*;
 public class ReadThread extends Thread {
     private BufferedReader reader;
     private Socket socket;
-    private ChatClient client;
+    private VideoClient client;
  
-    public ReadThread(Socket socket, ChatClient client) {
+    public ReadThread(Socket socket, VideoClient client) {
         this.socket = socket;
         this.client = client;
  
@@ -32,10 +36,8 @@ public class ReadThread extends Thread {
  
     public void run() {
         while (true) {
-            System.out.println("create img");
             try {
                 DataInputStream din = new DataInputStream(socket.getInputStream());
-
                 int len = din.readInt();
                 byte[] data = new byte[len];
                 if (len > 0) {
@@ -44,12 +46,9 @@ public class ReadThread extends Thread {
 
                 ByteArrayInputStream bis = new ByteArrayInputStream(data);
                 BufferedImage bImage2 = ImageIO.read(bis);
-                ImageIO.write(bImage2, "png", new File("output" + Math.random() + ".png"));
-
-                //client.getLoggedUser().setImage();
-
-                System.out.println("image created");
-                System.out.println("data received: " + len);
+                Image image = SwingFXUtils.toFXImage(bImage2, null);
+                //ImageIO.write(bImage2, "png", new File("output" + Math.random() + ".png"));
+                client.getRemoteUser().setImage(image);
             } catch (IOException ex) {
                 System.out.println("Error in chat.UserThread: " + ex.getMessage());
                 ex.printStackTrace();

@@ -16,7 +16,8 @@ import java.util.ResourceBundle;
 //https://www.daniweb.com/programming/software-development/threads/392710/basic-udp-chat-system
 public class Controller implements Initializable {
 
-
+    @FXML
+    ImageView remoteUser;
     @FXML
     ImageView loggedUser;
 
@@ -29,16 +30,12 @@ public class Controller implements Initializable {
     void callOn() {
         System.out.println("callOn");
         try {
-            new VideoClient(ServerSetting.SERVER_IP, ServerSetting.SERVER_PORT, loggedUser).openChannel();
+            //new VideoClient(ServerSetting.SERVER_IP, ServerSetting.SERVER_PORT, loggedUser).openChannel();
 
-            ChatClient client = new ChatClient("127.0.0.1", 9898, loggedUser);
-            client.execute();
+            VideoClient client = new VideoClient("127.0.0.1", 9898, loggedUser, remoteUser);
+            client.openChannel();
 
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (SocketException e) {
-            e.printStackTrace();
-        } catch (LineUnavailableException e) {
+        }  catch (Exception e) {
             e.printStackTrace();
         }
     }

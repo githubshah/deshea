@@ -26,7 +26,7 @@
                      <children>
                         <Pane layoutX="10.0" layoutY="9.0" prefHeight="267.0" prefWidth="419.0" style="-fx-background-color: black;">
                            <children>
-                              <ImageView fitHeight="236.0" fitWidth="419.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="remoteUser" fitHeight="236.0" fitWidth="419.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="/image/caller.png" />
                                  </image>

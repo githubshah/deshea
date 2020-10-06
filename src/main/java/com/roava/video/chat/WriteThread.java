@@ -1,5 +1,7 @@
 package com.roava.video.chat;
 
+import com.roava.video.VideoClient;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;

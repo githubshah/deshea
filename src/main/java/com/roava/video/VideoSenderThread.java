@@ -46,8 +46,8 @@ public class VideoSenderThread extends Thread {
     @Override
     public void run() {
         WebCam webCam = new WebCam();
-        webCam.setImageView(loggedUser);
-        webCam.setSocket(clientSenderSocket);
+        webCam.populateIn(loggedUser);
+        //webCam.setSocket(clientSenderSocket);
         webCam.start();
     }
 }

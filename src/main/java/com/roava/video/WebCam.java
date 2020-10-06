@@ -1,6 +1,5 @@
 package com.roava.video;
 
-import com.roava.audio.UtilAudio;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,10 +15,10 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import java.net.Socket;
 
 public class WebCam extends Thread {
     private static Mat frame = null;
@@ -37,7 +36,7 @@ public class WebCam extends Thread {
         }
 
         frame = new Mat();
-        tmrVideoProcess = new Timer(10, new ActionListener() {
+        tmrVideoProcess = new Timer(1, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (!videoCapture.read(frame)) {
                     tmrVideoProcess.stop();
@@ -52,6 +51,20 @@ public class WebCam extends Thread {
                     Image image = SwingFXUtils.toFXImage(img, null);
                     if (imageView != null) {
                         imageView.setImage(image);
+                    }
+                    if (dout != null) {
+                        System.out.println("Ready to Send picture...");
+                        BufferedImage bImage = null;
+                        try {
+                            byte[] data = baos.toByteArray();
+                            dout.writeInt(data.length);
+                            if (data.length > 0) {
+                                dout.write(data, 0, data.length);
+                                System.out.println("Sent picture...");
+                            }
+                        } catch (Exception exx) {
+                            exx.printStackTrace();
+                        }
                     }
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
@@ -71,13 +84,20 @@ public class WebCam extends Thread {
         return img;
     }
 
-    private DatagramSocket clientSenderSocket;
-
-    public void setSocket(DatagramSocket clientSenderSocket) {
-        this.clientSenderSocket = clientSenderSocket;
+    public void populateIn(ImageView imageView) {
+        this.imageView = imageView;
     }
 
-    public void setImageView(ImageView imageView) {
-        this.imageView = imageView;
+    Socket socket;
+    private DataOutputStream dout;
+
+    public void populateInSocket(Socket socket) {
+        this.socket = socket;
+        try {
+            dout = new DataOutputStream(socket.getOutputStream());
+        } catch (IOException ex) {
+            System.out.println("Error getting output stream: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 }
