@@ -28,11 +28,11 @@ public class UserThread extends Thread {
                     din.readFully(data);
                 }
                 System.out.println("data received: " + len);
-                server.broadcast(data);
+                server.broadcast(data, socket);
                 System.out.println("data send: " + len);
             } catch (IOException ex) {
                 //System.out.println("Error in chat.UserThread: " + ex.getMessage());
-                ex.printStackTrace();
+                //ex.printStackTrace();
             }
         }
     }

@@ -47,18 +47,29 @@ public class ChatServer {
         server.execute();
     }
 
-    public void broadcast(byte[] data) {
-        userThreads.forEach(x -> {
-            Socket socket = x.getSocket();
-            try {
-                DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
-                dout.writeInt(data.length);
-                if (data.length > 0) {
-                    dout.write(data, 0, data.length);
+    public void broadcast(byte[] data, Socket from) {
+        System.out.println("userThreads size: " + userThreads.size());
+        if (userThreads.size() == 1) {
+            sendMsg(data, from);
+        } else {
+            userThreads.forEach(socket -> {
+                Socket to = socket.getSocket();
+                if (!from.getInetAddress().getHostAddress().equals(to.getInetAddress().getHostAddress())) {
+                    sendMsg(data, to);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            });
+        }
+    }
+
+    private void sendMsg(byte[] data, Socket from) {
+        try {
+            DataOutputStream dout = new DataOutputStream(from.getOutputStream());
+            dout.writeInt(data.length);
+            if (data.length > 0) {
+                dout.write(data, 0, data.length);
             }
-        });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
