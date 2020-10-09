@@ -23,6 +23,14 @@ public class Main extends Application {
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 1035, 721));
         primaryStage.show();
+
+//        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/video.fxml"));
+//        Parent root = (Parent)fxmlLoader.load();
+//        Controller controller = fxmlLoader.<Controller>getController();
+//        primaryStage.setTitle("Hello World");
+//        primaryStage.setScene(new Scene(root, 1035, 721));
+//        primaryStage.show();
+
     }
 
     public static void main(String[] args)
