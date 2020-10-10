@@ -42,11 +42,11 @@ public class ImageViewPane extends Region {
     }
 
     public ImageViewPane(ImageView imageView) {
-        WebCam webCam = new WebCam();
-        //webCam.populateIn(imageView);
-        webCam.setWebCamScreen(1600, 1200);
-        //webCam.populateInSocket(clientSenderSocket);
-        webCam.start();
+//        WebCam webCam = new WebCam();
+//        //webCam.populateIn(imageView);
+//        webCam.setWebCamScreen(1600, 1200);
+//        //webCam.populateInSocket(clientSenderSocket);
+//        webCam.start();
         imageViewProperty.addListener(new ChangeListener<ImageView>() {
 
             @Override

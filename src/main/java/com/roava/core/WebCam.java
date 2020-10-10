@@ -1,6 +1,7 @@
 package com.roava.core;
 
 import org.imgscalr.Scalr;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -120,5 +121,13 @@ public class WebCam extends Thread {
     public void setWebCamScreen(int width, int height) {
         this.WIDTH = width;
         this.HEIGHT = height;
+    }
+
+    public WebCam(){
+        System.out.printf("load java.library.path: %s%n", System.getProperty("java.library.path"));
+        nu.pattern.OpenCV.loadShared(); //add this
+        Mat mat = Mat.eye(3, 3, CvType.CV_8UC1);
+        System.out.println("mat = " + mat.dump());
+        System.loadLibrary("opencv_java320");
     }
 }

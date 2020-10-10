@@ -24,7 +24,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        BufferedImage image1 = ImageIO.read(new File("/Users/daffolapmac-156/Desktop/as.png"));
+        BufferedImage image1 = ImageIO.read(
+            new File("/Users/daffolapmac-156/shaid-data/DesheaPatient/src/main/resources/image/ThankYou.png"));
         Image image = SwingFXUtils.toFXImage(image1, null);
         ImageView imageView = new ImageView();
         imageView.setImage(image);
@@ -60,12 +61,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        System.out.printf("java.library.path: %s%n", System.getProperty("java.library.path"));
-        nu.pattern.OpenCV.loadShared(); //add this
-        Mat mat = Mat.eye(3, 3, CvType.CV_8UC1);
-        System.out.println("mat = " + mat.dump());
-        System.loadLibrary("opencv_java320");
-
         launch(args);
     }
 }
