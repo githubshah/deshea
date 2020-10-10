@@ -4,15 +4,15 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class UserThread extends Thread {
+public class VideoThread extends Thread {
     public Socket getSocket() {
         return socket;
     }
 
     private Socket socket;
-    private ChatServer server;
+    private VideoServer server;
 
-    public UserThread(Socket socket, ChatServer server) {
+    public VideoThread(Socket socket, VideoServer server) {
         this.socket = socket;
         this.server = server;
     }
@@ -21,7 +21,6 @@ public class UserThread extends Thread {
         while (true) {
             try {
                 DataInputStream din = new DataInputStream(socket.getInputStream());
-
                 int len = din.readInt();
                 byte[] data = new byte[len];
                 if (len > 0) {

@@ -1,12 +1,11 @@
 
-import video.ChatServer;
+import video.VideoServer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -150,6 +149,7 @@ public class Main {
 
     public static void main(String args[]) throws Exception {
         //new Main().runVOIP();
-        new ChatServer(9898).execute();
+        new VideoServer().openVideoServerSocket();
+        new VideoServer().openInfoServerSocket();
     }
 }
