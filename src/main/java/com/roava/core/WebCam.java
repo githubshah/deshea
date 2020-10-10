@@ -1,8 +1,5 @@
-package com.roava.video;
+package com.roava.core;
 
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import org.imgscalr.Scalr;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
@@ -23,13 +20,18 @@ import java.net.Socket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/* how to use..
+*
+        WebCam webCam = new WebCam();
+        webCam.populateIn(imageView);
+        webCam.setSocket(clientSenderSocket);
+        webCam.start();
+*
+* */
 public class WebCam extends Thread {
     private static Mat frame = null;
     private VideoCapture videoCapture;
     private Timer tmrVideoProcess;
-
-    private ImageView imageView;
-
     ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 
     BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws Exception {
@@ -45,7 +47,7 @@ public class WebCam extends Thread {
         }
 
         frame = new Mat();
-        tmrVideoProcess = new Timer(5, new ActionListener() {
+        tmrVideoProcess = new Timer(0, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (!videoCapture.read(frame)) {
                     tmrVideoProcess.stop();
@@ -57,7 +59,7 @@ public class WebCam extends Thread {
                     img = Mat2bufferedImage(frame);
 
                     try {
-                        img = resizeImage(img, 300, 300);
+                        // img = resizeImage(img, WIDTH, HEIGHT);
                     } catch (Exception exception) {
                         exception.printStackTrace();
                     }
@@ -65,10 +67,7 @@ public class WebCam extends Thread {
 
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ImageIO.write(img, "jpg", baos);
-                    Image image = SwingFXUtils.toFXImage(img, null);
-                    if (imageView != null) {
-                        imageView.setImage(image);
-                    }
+
                     if (dout != null) {
                         System.out.println("Ready to Send picture...");
                         executor.execute(() -> {
@@ -103,12 +102,10 @@ public class WebCam extends Thread {
         return img;
     }
 
-    public void populateIn(ImageView imageView) {
-        this.imageView = imageView;
-    }
-
-    Socket socket;
+    private Socket socket;
     private DataOutputStream dout;
+    private int WIDTH = 300;
+    private int HEIGHT = 300;
 
     public void populateInSocket(Socket socket) {
         this.socket = socket;
@@ -118,5 +115,10 @@ public class WebCam extends Thread {
             System.out.println("Error getting output stream: " + ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    public void setWebCamScreen(int width, int height) {
+        this.WIDTH = width;
+        this.HEIGHT = height;
     }
 }

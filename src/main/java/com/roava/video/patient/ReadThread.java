@@ -1,14 +1,18 @@
-package com.roava.video.chat;
+package com.roava.video.patient;
 
-import com.roava.video.VideoClient;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.net.*;
-import java.util.zip.DataFormatException;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.Socket;
 
 /**
  * This thread is responsible for reading server's input and printing it
@@ -20,12 +24,12 @@ import java.util.zip.DataFormatException;
 public class ReadThread extends Thread {
     private BufferedReader reader;
     private Socket socket;
-    private VideoClient client;
- 
-    public ReadThread(Socket socket, VideoClient client) {
+    private ImageView imageView;
+
+    public ReadThread(Socket socket, ImageView imageView) {
         this.socket = socket;
-        this.client = client;
- 
+        this.imageView = imageView;
+
         try {
             InputStream input = socket.getInputStream();
             reader = new BufferedReader(new InputStreamReader(input));
@@ -34,7 +38,7 @@ public class ReadThread extends Thread {
             ex.printStackTrace();
         }
     }
- 
+
     public void run() {
         while (true) {
             try {
@@ -49,7 +53,7 @@ public class ReadThread extends Thread {
                 BufferedImage bImage2 = ImageIO.read(bis);
                 Image image = SwingFXUtils.toFXImage(bImage2, null);
                 //ImageIO.write(bImage2, "png", new File("output" + Math.random() + ".png"));
-                client.getRemoteUser().setImage(image);
+                imageView.setImage(image);
             } catch (IOException ex) {
                 System.out.println("Error in chat.UserThread: " + ex.getMessage());
                 ex.printStackTrace();
