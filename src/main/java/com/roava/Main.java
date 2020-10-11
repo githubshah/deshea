@@ -48,7 +48,6 @@ public class Main extends Application {
         SocketBridge socketBridge = new SocketBridge();
         socketBridge.renderIn(imageView);
         socketBridge.connectToServer();
-        //socketBridge.disconnectFromServer();
     }
 
     public static void main(String[] args) {

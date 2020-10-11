@@ -19,7 +19,7 @@ public class SocketBridge {
     }
 
     public void connectToServer() throws IOException {
-        MessagePacket connect = new MessagePacket("sahid@gmail.com", "connect");
+        MessagePacket connect = new MessagePacket("sahid@gmail.com", "connecttoreceptionist");
         DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
         dout.writeUTF(new Gson().toJson(connect));
     }
