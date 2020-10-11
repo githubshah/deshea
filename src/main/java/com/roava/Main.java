@@ -1,7 +1,5 @@
 package com.roava;
 
-import com.roava.core.WebCam;
-import com.roava.video.patient.ReadThread;
 import com.roava.video.patient.ImageViewPane;
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
@@ -12,13 +10,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.net.Socket;
 
 public class Main extends Application {
 
@@ -50,14 +45,10 @@ public class Main extends Application {
         primaryStage.setTitle("patient");
         primaryStage.show();
 
-        Socket socket = new Socket("127.0.0.1", 9898);
-        //Socket socket1 = new Socket("127.0.0.1", 9898);
-        System.out.println("Connected to the chat server");
-        WebCam webCam = new WebCam();
-        webCam.populateInSocket(socket);
-        webCam.start();
-        new ReadThread(socket, imageView).start();
-
+        SocketBridge socketBridge = new SocketBridge();
+        socketBridge.renderIn(imageView);
+        socketBridge.connectToServer();
+        //socketBridge.disconnectFromServer();
     }
 
     public static void main(String[] args) {
