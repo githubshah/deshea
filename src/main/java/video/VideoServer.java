@@ -44,8 +44,9 @@ public class VideoServer {
 
             while (true) {
                 Socket socket = serverSocket.accept();
+                System.out.println("requested user IP: " + socket.getInetAddress().getHostName());
                 if (userSessionThreadPool
-                    .stream().peek(x -> System.out.println("requested user IP: "+socket.getInetAddress().getHostName()))
+                    .stream().peek(x -> System.out.println("check already user IP: " + socket.getInetAddress().getHostName()))
                     .anyMatch(x -> socket.getInetAddress().getHostName().equals(x.getIp()))
                 ) {
                     System.out.println("User already is in session");
@@ -156,7 +157,8 @@ public class VideoServer {
         System.out.println(userSessionThreadPool.size());
         return userSessionThreadPool
             .stream()
-            .filter(useSessionThread -> useSessionThread.getType().equals("patient"))
+            .peek(x -> System.out.println("getPatientList: " + x.getType()))
+            .filter(useSessionThread -> ("patient").equals(useSessionThread.getType()))
             .map(UserSessionThread::getEmail)
             .collect(Collectors.toList());
     }
