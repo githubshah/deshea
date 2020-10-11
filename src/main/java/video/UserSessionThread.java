@@ -28,17 +28,17 @@ public class UserSessionThread extends Thread {
             try {
                 DataInputStream din = new DataInputStream(socket.getInputStream());
                 String msg = din.readUTF();
-                Client client = new Gson().fromJson(msg, Client.class);
-                switch (client.getEvent()) {
+                MessagePacket messagePacket = new Gson().fromJson(msg, MessagePacket.class);
+                switch (messagePacket.getEvent()) {
                     case "connect":
-                        this.email = client.getEmail();
+                        this.email = messagePacket.getEmail();
                         this.ip = socket.getInetAddress().getHostName();
                         if (server.createSession(email, ip)) {
-                            Client connect = new Client("sahid@gmail.com", "receptionistavailable");
+                            MessagePacket connect = new MessagePacket("sahid@gmail.com", "receptionistavailable");
                             DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
                             dout.writeUTF(new Gson().toJson(connect));
                         } else {
-                            Client connect = new Client("sahid@gmail.com", "noreceptionist");
+                            MessagePacket connect = new MessagePacket("sahid@gmail.com", "noreceptionist");
                             DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
                             dout.writeUTF(new Gson().toJson(connect));
                         }
@@ -48,7 +48,7 @@ public class UserSessionThread extends Thread {
                         break;
                     case "connactto":
                         this.ip = socket.getInetAddress().getHostName();
-                        server.connectTo(ip, client.getConnectTo());
+                        server.connectTo(ip, messagePacket.getConnectTo());
                         break;
                     case "patientlist":
                         break;

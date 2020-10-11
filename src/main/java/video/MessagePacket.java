@@ -1,11 +1,11 @@
 package video;
 
-public class Client {
+public class MessagePacket {
     private String email;
     private String event;
     private String connectTo;
 
-    public Client(String email, String event) {
+    public MessagePacket(String email, String event) {
         this.email = email;
         this.event = event;
     }
