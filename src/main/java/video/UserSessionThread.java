@@ -32,7 +32,7 @@ public class UserSessionThread extends Thread {
                 String msg = din.readUTF();
                 MessagePacket messagePacket = new Gson().fromJson(msg, MessagePacket.class);
                 switch (messagePacket.getEvent()) {
-                    case "connect":
+                    case "connecttoreceptionist":
                         this.email = messagePacket.getEmail();
                         this.ip = socket.getInetAddress().getHostName();
                         if (server.createSession(email, ip)) {
