@@ -67,6 +67,7 @@ public class UserSessionThread extends Thread {
                         System.out.println("type: " + type + " ," + "Request Event: Constants.CONNECT_TO_RECEPTIONIST " + email + " : " + ip);
                         this.email = messagePacket.getEmail();
                         this.ip = socket.getInetAddress().getHostName();
+                        this.type = messagePacket.getType();
                         server.createSession(email, ip);
                         if (server.hasConnection(ip)) {
                             MessagePacket available =
