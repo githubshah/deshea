@@ -24,7 +24,7 @@ public class UserSessionThread extends Thread {
             try {
                 DataInputStream din = new DataInputStream(socket.getInputStream());
                 String msg = din.readUTF();
-                System.out.println("---------"+msg);
+                System.out.println("---------" + msg);
                 MessagePacket messagePacket = new Gson().fromJson(msg, MessagePacket.class);
                 String type = messagePacket.getType();
                 switch (messagePacket.getEvent()) {
@@ -53,14 +53,6 @@ public class UserSessionThread extends Thread {
                         connectionList.writeUTF(new Gson().toJson(
                             new MessagePacket(email, Constants.GET_CONNECTIONS, "receptionist").setConnection(server.getConnectionList())));
                         break;
-                    case Constants.CONNECT_TO:
-                        System.out.println("type: " + type + " ," + "Request Event: Constants.CONNECT_TO " + email + " : " + ip);
-                        this.ip = socket.getInetAddress().getHostName();
-                        Socket patientSocket = server.connectTo(ip, messagePacket.getConnectTo());
-                        MessagePacket connect = new MessagePacket("sahid@gmail.com", "receptionistavailable", "patient");
-                        DataOutputStream receptionAvailable = new DataOutputStream(patientSocket.getOutputStream());
-                        receptionAvailable.writeUTF(new Gson().toJson(connect));
-                        break;
                     case Constants.CONNECT_TO_RECEPTIONIST:
                         System.out.println("type: " + type + " ," + "Request Event: Constants.CONNECT_TO_RECEPTIONIST " + email + " : " + ip);
                         this.email = messagePacket.getEmail();
@@ -78,6 +70,15 @@ public class UserSessionThread extends Thread {
                             DataOutputStream receptionistNotAvailable = new DataOutputStream(socket.getOutputStream());
                             receptionistNotAvailable.writeUTF(new Gson().toJson(notAvailable));
                         }
+                        break;
+                    case Constants.CONNECT_TO:
+                        System.out.println("type: " + type + " ," + "Request Event: Constants.CONNECT_TO " + email + " : " + ip);
+                        this.ip = socket.getInetAddress().getHostName();
+                        Socket patientSocket = server.connectTo(ip, messagePacket.getConnectTo());
+                        System.out.println("pationt socket : " + patientSocket);
+                        MessagePacket connect = new MessagePacket(email, Constants.RECEPTIONIST_AVAILABLE, type);
+                        DataOutputStream receptionAvailable = new DataOutputStream(patientSocket.getOutputStream());
+                        receptionAvailable.writeUTF(new Gson().toJson(connect));
                         break;
                     default:
                 }

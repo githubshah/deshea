@@ -133,12 +133,14 @@ public class VideoServer {
     }
 
     public Socket connectTo(String ip, String email) {
-        System.out.println("Create connection between " + ip + " : " + email);
+        System.out.println("Request to Create connection between " + ip + " : " + email);
         String patientIp = activeUserMap.get(email);
+        System.out.println("++++patientIp: " + patientIp);
         conferenceMap.put(ip, patientIp); // receptionistIp => clientIp
 
         for (UserSessionThread x : userSessionThreadPool) {
             if (x.getIp().equals(patientIp)) {
+                System.out.println("Patient Got it: " + x.getIp());
                 return x.getSocket();
             }
         }
