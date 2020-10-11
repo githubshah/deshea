@@ -9,8 +9,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class VideoServer {
     private Set<VideoThread> videoThreadPool = new HashSet<>(); // ip
@@ -42,7 +44,7 @@ public class VideoServer {
 
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println("New user connected");
+                System.out.println("Chat New user connected");
 
                 UserSessionThread newUser = new UserSessionThread(socket, this);
                 userSessionThreadPool.add(newUser);
@@ -142,5 +144,29 @@ public class VideoServer {
 
     public boolean hasConnection(String ip) {
         return (String) conferenceMap.get(ip) != null || (String) conferenceMap.getKey(ip) != null;
+    }
+
+    public List<String> getPatientList() {
+        System.out.println(userSessionThreadPool.size());
+        return userSessionThreadPool
+            .stream()
+            .filter(useSessionThread -> useSessionThread.getType().equals("patient"))
+            .map(UserSessionThread::getEmail)
+            .collect(Collectors.toList());
+    }
+
+    public List<String> getReceptionistList() {
+        List<String> collect = userSessionThreadPool
+            .stream()
+            .map(UserSessionThread::getEmail)
+            .collect(Collectors.toList());
+        System.out.println("getReceptionistList: " + collect);
+        return collect;
+    }
+
+    public Map<String, String> getConnectionList() {
+        Map<String, String> map = new HashMap<>();
+        activeUserMap.forEach(map::put);
+        return map;
     }
 }

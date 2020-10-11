@@ -1,13 +1,20 @@
 package video;
 
-public class MessagePacket {
-    private String email;
-    private String event;
-    private String connectTo;
+import java.util.List;
+import java.util.Map;
 
-    public MessagePacket(String email, String event) {
+public class MessagePacket {
+    String email;
+    String event;
+    String connectTo;
+    String type;
+    List<String> emailPojos;
+    Map<String, String> connection;
+
+    public MessagePacket(String email, String event, String type) {
         this.email = email;
         this.event = event;
+        this.type = type;
     }
 
     public String getEmail() {
@@ -32,5 +39,31 @@ public class MessagePacket {
 
     public void setConnectTo(String connectTo) {
         this.connectTo = connectTo;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<String> getEmailPojos() {
+        return emailPojos;
+    }
+
+    public MessagePacket setEmailPojos(List<String> emailPojos) {
+        this.emailPojos = emailPojos;
+        return this;
+    }
+
+    public Map<String, String> getConnection() {
+        return connection;
+    }
+
+    public MessagePacket setConnection(Map<String, String> connection) {
+        this.connection = connection;
+        return this;
     }
 }
