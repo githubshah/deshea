@@ -27,7 +27,7 @@ public class VideoThread extends Thread {
                     din.readFully(data);
                 }
                 System.out.println("data received: " + len);
-                server.broadcast(data, socket);
+                //server.broadcast(data, socket);
                 server.peerToPeer(data, socket);
                 System.out.println("data send: " + len);
             } catch (IOException ex) {
