@@ -1,6 +1,7 @@
 package video;
 
 import org.apache.commons.collections.BidiMap;
+import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 
 import java.io.DataOutputStream;
@@ -21,6 +22,7 @@ public class VideoServer {
     private Map<String, String> activeUserMap = new HashMap(); // email, ip
 
     public void openVideoServerSocket() {
+        conferenceMap.put("59.89.53.93", "139.167.210.102");
         try (ServerSocket serverSocket = new ServerSocket(9898)) {
             System.out.println("Chat Server is listening on port " + 9898);
             while (true) {
@@ -183,7 +185,10 @@ public class VideoServer {
 
     public Map<String, String> getConnectionList() {
         Map<String, String> map = new HashMap<>();
-        activeUserMap.forEach(map::put);
+        MapIterator mapIterator = conferenceMap.mapIterator();
+        while (mapIterator.hasNext()) {
+            map.put((String) mapIterator.next(), (String) mapIterator.getValue());
+        }
         return map;
     }
 }
