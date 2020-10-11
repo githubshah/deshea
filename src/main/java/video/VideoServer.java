@@ -101,8 +101,10 @@ public class VideoServer {
             otherUserIp = (String) conferenceMap.getKey(requestIP);
         }
 
+
         final Socket[] socket = new Socket[1];
         String finalOtherUserIp = otherUserIp;
+        System.out.println("OtherIP: " + otherUserIp);
         if (finalOtherUserIp == null) {
             System.out.println("not have any connection");
             return;
@@ -110,6 +112,7 @@ public class VideoServer {
         videoThreadPool.forEach(t -> {
             // otherUserIp => connect user
             if (t.getSocket().getInetAddress().getHostAddress().equals(finalOtherUserIp)) {
+                System.out.println("message send to: " + t.getSocket().getInetAddress().getHostAddress());
                 socket[0] = t.getSocket();
             }
         });
