@@ -190,7 +190,7 @@ public class VideoServer {
     public Map<String, String> getConnectionList() {
         Map<String, String> map = new HashMap<>();
         System.out.println("size of confer======== " + conferenceMap.size());
-        map.put("59.89.53.93", "139.167.210.102");
+        map.put("59.89.53.93", "139.167.197.233");
         System.out.println("size of map: " + map.size());
         return map;
     }
