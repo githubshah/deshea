@@ -19,31 +19,31 @@ public class SocketBridge {
     }
 
     public void connectToServer() throws IOException {
-        Client connect = new Client("sahid@gmail.com", "connect");
+        MessagePacket connect = new MessagePacket("sahid@gmail.com", "connect");
         DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
         dout.writeUTF(new Gson().toJson(connect));
     }
 
     public void disconnectFromServer() throws IOException {
-        Client connect = new Client("sahid@gmail.com", "disconnect");
+        MessagePacket connect = new MessagePacket("sahid@gmail.com", "disconnect");
         DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
         dout.writeUTF(new Gson().toJson(connect));
     }
 
     public void getListOfPatient() throws IOException {
-        Client connect = new Client("sahid@gmail.com", "patientlist");
+        MessagePacket connect = new MessagePacket("sahid@gmail.com", "patientlist");
         DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
         dout.writeUTF(new Gson().toJson(connect));
     }
 
     public void getListOfReceptionist() throws IOException {
-        Client connect = new Client("sahid@gmail.com", "receptionistlist");
+        MessagePacket connect = new MessagePacket("sahid@gmail.com", "receptionistlist");
         DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
         dout.writeUTF(new Gson().toJson(connect));
     }
 
     public void getListOfConnection() throws IOException {
-        Client connect = new Client("sahid@gmail.com", "connectionlist");
+        MessagePacket connect = new MessagePacket("sahid@gmail.com", "connectionlist");
         DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
         dout.writeUTF(new Gson().toJson(connect));
     }
@@ -68,8 +68,8 @@ public class SocketBridge {
                     DataInputStream din = new DataInputStream(eventSocket.getInputStream());
                     String msg = din.readUTF();
                     System.out.println(msg);
-                    Client client = new Gson().fromJson(msg, Client.class);
-                    switch (client.getEvent()) {
+                    MessagePacket messagePacket = new Gson().fromJson(msg, MessagePacket.class);
+                    switch (messagePacket.getEvent()) {
                         case "receptionistavailable":
                             System.out.println("avail recp");
                             this.startVideoCalling();

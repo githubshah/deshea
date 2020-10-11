@@ -1,11 +1,11 @@
 package com.roava;
 
-public class Client {
+public class MessagePacket {
     String email;
     String event;
     String connectTo;
 
-    public Client(String email, String event) {
+    public MessagePacket(String email, String event) {
         this.email = email;
         this.event = event;
     }
