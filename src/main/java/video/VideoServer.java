@@ -187,6 +187,7 @@ public class VideoServer {
         Map<String, String> map = new HashMap<>();
         MapIterator mapIterator = conferenceMap.mapIterator();
         while (mapIterator.hasNext()) {
+            System.out.println("Size of connection...");
             map.put((String) mapIterator.next(), (String) mapIterator.getValue());
         }
         return map;

@@ -63,6 +63,7 @@ public class MessagePacket {
     }
 
     public MessagePacket setConnection(Map<String, String> connection) {
+        System.out.println("size of connections : " + connection.size());
         this.connection = connection;
         return this;
     }
