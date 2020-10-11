@@ -122,9 +122,17 @@ public class VideoServer {
 
     }
 
-    public void connectTo(String ip, String email) {
+    public Socket connectTo(String ip, String email) {
         System.out.println("Create connection between " + ip + " : " + ip);
-        conferenceMap.put(ip, activeUserMap.get(email)); // receptionistIp => clientIp
+        String patientIp = activeUserMap.get(email);
+        conferenceMap.put(ip, patientIp); // receptionistIp => clientIp
+
+        for (UserSessionThread x : userSessionThreadPool) {
+            if (x.getIp().equals(patientIp)) {
+                return x.getSocket();
+            }
+        }
+        return null;
     }
 
     public boolean createSession(String email, String ip) {

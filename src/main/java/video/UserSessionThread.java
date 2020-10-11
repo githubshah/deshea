@@ -9,6 +9,7 @@ import java.net.Socket;
 
 public class UserSessionThread extends Thread {
     private String email;
+
     private String ip;
 
     public Socket getSocket() {
@@ -16,6 +17,7 @@ public class UserSessionThread extends Thread {
     }
 
     private Socket socket;
+
     private VideoServer server;
 
     public UserSessionThread(Socket socket, VideoServer server) {
@@ -48,7 +50,10 @@ public class UserSessionThread extends Thread {
                         break;
                     case "connactto":
                         this.ip = socket.getInetAddress().getHostName();
-                        server.connectTo(ip, messagePacket.getConnectTo());
+                        Socket patientSocket = server.connectTo(ip, messagePacket.getConnectTo());
+                        MessagePacket connect = new MessagePacket("sahid@gmail.com", "receptionistavailable");
+                        DataOutputStream dout = new DataOutputStream(patientSocket.getOutputStream());
+                        dout.writeUTF(new Gson().toJson(connect));
                         break;
                     case "patientlist":
                         break;
@@ -63,5 +68,9 @@ public class UserSessionThread extends Thread {
                 //ex.printStackTrace();
             }
         }
+    }
+
+    public String getIp() {
+        return ip;
     }
 }
