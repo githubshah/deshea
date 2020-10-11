@@ -35,7 +35,8 @@ public class UserSessionThread extends Thread {
                     case "connecttoreceptionist":
                         this.email = messagePacket.getEmail();
                         this.ip = socket.getInetAddress().getHostName();
-                        if (server.createSession(email, ip)) {
+                        server.createSession(email, ip);
+                        if (server.hasConnection(ip)) {
                             MessagePacket connect = new MessagePacket("sahid@gmail.com", "receptionistavailable");
                             DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
                             dout.writeUTF(new Gson().toJson(connect));

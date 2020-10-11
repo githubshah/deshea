@@ -123,7 +123,7 @@ public class VideoServer {
     }
 
     public Socket connectTo(String ip, String email) {
-        System.out.println("Create connection between " + ip + " : " + ip);
+        System.out.println("Create connection between " + ip + " : " + email);
         String patientIp = activeUserMap.get(email);
         conferenceMap.put(ip, patientIp); // receptionistIp => clientIp
 
@@ -135,11 +135,9 @@ public class VideoServer {
         return null;
     }
 
-    public boolean createSession(String email, String ip) {
+    public void createSession(String email, String ip) {
         System.out.println("User is under session: " + email);
         activeUserMap.put(email, ip);
-        return hasConnection(ip);
-        //return true;
     }
 
     public boolean hasConnection(String ip) {
