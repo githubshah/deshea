@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class SocketBridge {
+    final String type = "patient";
+    final String email = "patient@gmail.com";
     private Socket eventSocket;
 
     public SocketBridge() throws IOException {
@@ -19,31 +21,7 @@ public class SocketBridge {
     }
 
     public void connectToServer() throws IOException {
-        MessagePacket connect = new MessagePacket("sahid@gmail.com", "connecttoreceptionist");
-        DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
-        dout.writeUTF(new Gson().toJson(connect));
-    }
-
-    public void disconnectFromServer() throws IOException {
-        MessagePacket connect = new MessagePacket("sahid@gmail.com", "disconnect");
-        DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
-        dout.writeUTF(new Gson().toJson(connect));
-    }
-
-    public void getListOfPatient() throws IOException {
-        MessagePacket connect = new MessagePacket("sahid@gmail.com", "patientlist");
-        DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
-        dout.writeUTF(new Gson().toJson(connect));
-    }
-
-    public void getListOfReceptionist() throws IOException {
-        MessagePacket connect = new MessagePacket("sahid@gmail.com", "receptionistlist");
-        DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
-        dout.writeUTF(new Gson().toJson(connect));
-    }
-
-    public void getListOfConnection() throws IOException {
-        MessagePacket connect = new MessagePacket("sahid@gmail.com", "connectionlist");
+        MessagePacket connect = new MessagePacket(email, Constants.CONNECT_TO_RECEPTIONIST);
         DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
         dout.writeUTF(new Gson().toJson(connect));
     }
@@ -70,24 +48,16 @@ public class SocketBridge {
                     System.out.println(msg);
                     MessagePacket messagePacket = new Gson().fromJson(msg, MessagePacket.class);
                     switch (messagePacket.getEvent()) {
-                        case "receptionistavailable":
-                            System.out.println("avail recp");
-                            this.startVideoCalling();
+                        case Constants.RECEPTIONIST_NOT_AVAILABLE:
+                            System.out.println("RECEPTIONIST_NOT_AVAILABLE");
+                            //this.startVideoCalling();
                             break;
-                        case "noreceptionist":
-                            System.out.println("no recep");
+                        case Constants.RECEPTIONIST_AVAILABLE:
+                            System.out.println("RECEPTIONIST_AVAILABLE");
 //                            MessagePacket connect =
 //                                new MessagePacket("sahid@gmail.com", "connactto", "sahid@gmail.com");
 //                            DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
 //                            dout.writeUTF(new Gson().toJson(connect));
-                            break;
-                        case "connactto":
-                            break;
-                        case "patientlist":
-                            break;
-                        case "receptionistlist":
-                            break;
-                        case "connectionlist":
                             break;
                         default:
                     }
