@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,11 +45,11 @@ public class VideoServer {
             while (true) {
                 Socket socket = serverSocket.accept();
                 if (userSessionThreadPool
-                    .stream()
+                    .stream().peek(x -> System.out.println("requested user IP: "+socket.getInetAddress().getHostName()))
                     .anyMatch(x -> socket.getInetAddress().getHostName().equals(x.getIp()))
                 ) {
                     System.out.println("User already is in session");
-                }else{
+                } else {
                     System.out.println("Chat New user connected");
                     UserSessionThread newUser = new UserSessionThread(socket, this);
                     userSessionThreadPool.add(newUser);
