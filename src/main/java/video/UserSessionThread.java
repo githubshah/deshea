@@ -3,6 +3,7 @@ package video;
 import com.google.gson.Gson;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -32,7 +33,15 @@ public class UserSessionThread extends Thread {
                     case "connect":
                         this.email = client.getEmail();
                         this.ip = socket.getInetAddress().getHostName();
-                        server.createSession(email, ip);
+                        if (server.createSession(email, ip)) {
+                            Client connect = new Client("sahid@gmail.com", "receptionistavailable");
+                            DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
+                            dout.writeUTF(new Gson().toJson(connect));
+                        } else {
+                            Client connect = new Client("sahid@gmail.com", "noreceptionist");
+                            DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
+                            dout.writeUTF(new Gson().toJson(connect));
+                        }
                         break;
                     case "disconnect":
                         server.removeSession();
@@ -40,6 +49,12 @@ public class UserSessionThread extends Thread {
                     case "connactto":
                         this.ip = socket.getInetAddress().getHostName();
                         server.connectTo(ip, client.getConnectTo());
+                        break;
+                    case "patientlist":
+                        break;
+                    case "receptionistlist":
+                        break;
+                    case "connectionlist":
                         break;
                     default:
                 }

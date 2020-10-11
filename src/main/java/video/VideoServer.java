@@ -93,6 +93,10 @@ public class VideoServer {
 
         final Socket[] socket = new Socket[1];
         String finalOtherUserIp = otherUserIp;
+        if (finalOtherUserIp == null) {
+            System.out.println("not have any connection");
+            return;
+        }
         videoThreadPool.forEach(t -> {
             // otherUserIp => connect user
             if (t.getSocket().getInetAddress().getHostAddress().equals(finalOtherUserIp)) {
@@ -123,8 +127,14 @@ public class VideoServer {
         conferenceMap.put(ip, activeUserMap.get(email)); // receptionistIp => clientIp
     }
 
-    public void createSession(String email, String ip) {
+    public boolean createSession(String email, String ip) {
         System.out.println("User is under session: " + email);
         activeUserMap.put(email, ip);
+        return hasConnection(ip);
+        //return true;
+    }
+
+    public boolean hasConnection(String ip) {
+        return (String) conferenceMap.get(ip) != null || (String) conferenceMap.getKey(ip) != null;
     }
 }

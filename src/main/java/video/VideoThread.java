@@ -28,6 +28,7 @@ public class VideoThread extends Thread {
                 }
                 System.out.println("data received: " + len);
                 server.broadcast(data, socket);
+                //server.peerToPeer(data, socket);
                 System.out.println("data send: " + len);
             } catch (IOException ex) {
                 //System.out.println("Error in chat.UserThread: " + ex.getMessage());
