@@ -156,16 +156,16 @@ public class VideoServer {
     public List<String> getPatientList() {
         System.out.println(userSessionThreadPool.size());
 
-        userSessionThreadPool.forEach(x-> {
-            System.out.println(">>>>>email: "+x.getEmail());
-            System.out.println("Ip: "+x.getIp());
-            System.out.println("<<<<<type: "+x.getType());
-        });
+//        userSessionThreadPool.forEach(x-> {
+//            System.out.println(">>>>>email: "+x.getEmail());
+//            System.out.println("Ip: "+x.getIp());
+//            System.out.println("<<<<<type: "+x.getType());
+//        });
 
 
         return userSessionThreadPool
             .stream()
-            .peek(x -> System.out.println("getPatientList: " + x.getType()))
+            //.peek(x -> System.out.println("getPatientList: " + x.getType()))
             .filter(useSessionThread -> ("patient").equals(useSessionThread.getType()))
             .map(UserSessionThread::getEmail)
             .collect(Collectors.toList());
@@ -174,6 +174,7 @@ public class VideoServer {
     public List<String> getReceptionistList() {
         List<String> collect = userSessionThreadPool
             .stream()
+            .filter(useSessionThread -> ("receptionist").equals(useSessionThread.getType()))
             .map(UserSessionThread::getEmail)
             .collect(Collectors.toList());
         System.out.println("getReceptionistList: " + collect);

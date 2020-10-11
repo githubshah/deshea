@@ -24,16 +24,14 @@ public class UserSessionThread extends Thread {
             try {
                 DataInputStream din = new DataInputStream(socket.getInputStream());
                 String msg = din.readUTF();
-                System.out.println(msg);
+                System.out.println("---------"+msg);
                 MessagePacket messagePacket = new Gson().fromJson(msg, MessagePacket.class);
                 String type = messagePacket.getType();
                 switch (messagePacket.getEvent()) {
                     case Constants.CONNECT:
                         this.email = messagePacket.getEmail();
                         this.ip = socket.getInetAddress().getHostName();
-                        System.out.println("connect type: "+ messagePacket.getType());
                         this.type = messagePacket.getType();
-                        System.out.println("connect type: "+ this.type);
                         System.out.println("type: " + type + " ," + "Request Event: Constants.CONNECT " + email + " : " + ip);
                         server.createSession(email, ip);
                         break;
