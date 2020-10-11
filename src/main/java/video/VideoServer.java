@@ -21,7 +21,7 @@ public class VideoServer {
     private Map<String, String> activeUserMap = new HashMap(); // email, ip
 
     public void openVideoServerSocket() {
-        conferenceMap.put("59.89.53.93", "139.167.210.102");
+        conferenceMap.put("59.89.53.93", "139.167.197.233");
         try (ServerSocket serverSocket = new ServerSocket(9898)) {
             System.out.println("Chat Server is listening on port " + 9898);
             while (true) {
