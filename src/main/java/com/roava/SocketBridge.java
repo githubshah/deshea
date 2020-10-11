@@ -16,7 +16,7 @@ public class SocketBridge {
     private Socket eventSocket;
 
     public SocketBridge() throws IOException {
-        eventSocket = new Socket("127.0.0.1", 9897);
+        eventSocket = new Socket("3.16.216.89", 9897);
         new Thread(new ListenerThread(eventSocket)).start();
     }
 
@@ -65,7 +65,7 @@ public class SocketBridge {
         }
 
         private void startVideoCalling() throws IOException {
-            Socket socket = new Socket("127.0.0.1", 9898);
+            Socket socket = new Socket("3.16.216.89", 9898);
             System.out.println("Connected to the chat server");
             WebCam webCam = new WebCam();
             webCam.populateInSocket(socket);
