@@ -155,6 +155,14 @@ public class VideoServer {
 
     public List<String> getPatientList() {
         System.out.println(userSessionThreadPool.size());
+
+        userSessionThreadPool.forEach(x-> {
+            System.out.println(">>>>>email: "+x.getEmail());
+            System.out.println("Ip: "+x.getIp());
+            System.out.println("<<<<<type: "+x.getType());
+        });
+
+
         return userSessionThreadPool
             .stream()
             .peek(x -> System.out.println("getPatientList: " + x.getType()))

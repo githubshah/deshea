@@ -31,7 +31,9 @@ public class UserSessionThread extends Thread {
                     case Constants.CONNECT:
                         this.email = messagePacket.getEmail();
                         this.ip = socket.getInetAddress().getHostName();
+                        System.out.println("connect type: "+ messagePacket.getType());
                         this.type = messagePacket.getType();
+                        System.out.println("connect type: "+ this.type);
                         System.out.println("type: " + type + " ," + "Request Event: Constants.CONNECT " + email + " : " + ip);
                         server.createSession(email, ip);
                         break;
