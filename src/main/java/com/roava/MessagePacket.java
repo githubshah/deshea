@@ -3,16 +3,20 @@ package com.roava;
 public class MessagePacket {
     String email;
     String event;
-    String connectTo;
 
-    public MessagePacket(String email, String event) {
+    String type;
+
+    String connectTo;
+    public MessagePacket(String email, String event, String type) {
         this.email = email;
         this.event = event;
+        this.type = type;
     }
 
-    public MessagePacket(String email, String event, String connectTo) {
+    public MessagePacket(String email, String event, String type, String connectTo) {
         this.email = email;
         this.event = event;
+        this.type = type;
         this.connectTo = connectTo;
     }
 
@@ -38,5 +42,13 @@ public class MessagePacket {
 
     public void setConnectTo(String connectTo) {
         this.connectTo = connectTo;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

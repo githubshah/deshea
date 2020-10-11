@@ -21,7 +21,7 @@ public class SocketBridge {
     }
 
     public void connectToServer() throws IOException {
-        MessagePacket connect = new MessagePacket(email, Constants.CONNECT_TO_RECEPTIONIST);
+        MessagePacket connect = new MessagePacket(email, Constants.CONNECT_TO_RECEPTIONIST, type);
         DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
         dout.writeUTF(new Gson().toJson(connect));
     }
@@ -50,14 +50,10 @@ public class SocketBridge {
                     switch (messagePacket.getEvent()) {
                         case Constants.RECEPTIONIST_NOT_AVAILABLE:
                             System.out.println("RECEPTIONIST_NOT_AVAILABLE");
-                            //this.startVideoCalling();
                             break;
                         case Constants.RECEPTIONIST_AVAILABLE:
                             System.out.println("RECEPTIONIST_AVAILABLE");
-//                            MessagePacket connect =
-//                                new MessagePacket("sahid@gmail.com", "connactto", "sahid@gmail.com");
-//                            DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
-//                            dout.writeUTF(new Gson().toJson(connect));
+                            this.startVideoCalling();
                             break;
                         default:
                     }
