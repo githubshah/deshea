@@ -21,7 +21,7 @@ public class VideoServer {
     private Map<String, String> activeUserMap = new HashMap(); // email, ip
 
     public void openVideoServerSocket() {
-        conferenceMap.put("59.89.53.93", "139.167.197.233");
+        conferenceMap.put("59.89.53.93", "103.92.43.236");
         try (ServerSocket serverSocket = new ServerSocket(9898)) {
             System.out.println("Chat Server is listening on port " + 9898);
             while (true) {
@@ -190,7 +190,7 @@ public class VideoServer {
     public Map<String, String> getConnectionList() {
         Map<String, String> map = new HashMap<>();
         System.out.println("size of confer======== " + conferenceMap.size());
-        map.put("59.89.53.93", "139.167.197.233");
+        map.put("59.89.53.93", "103.92.43.236");
         System.out.println("size of map: " + map.size());
         return map;
     }
