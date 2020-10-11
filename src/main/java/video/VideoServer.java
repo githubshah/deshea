@@ -1,7 +1,6 @@
 package video;
 
 import org.apache.commons.collections.BidiMap;
-import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 
 import java.io.DataOutputStream;
@@ -185,11 +184,9 @@ public class VideoServer {
 
     public Map<String, String> getConnectionList() {
         Map<String, String> map = new HashMap<>();
-        MapIterator mapIterator = conferenceMap.mapIterator();
-        while (mapIterator.hasNext()) {
-            System.out.println("Size of connection...");
-            map.put((String) mapIterator.next(), (String) mapIterator.getValue());
-        }
+        System.out.println("size of confer======== " + conferenceMap.size());
+        map.put("59.89.53.93", "139.167.210.102");
+        System.out.println("size of map: " + map.size());
         return map;
     }
 }
