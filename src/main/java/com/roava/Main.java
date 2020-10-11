@@ -34,7 +34,7 @@ public class Main extends Application {
         vbox.getChildren().addAll(root);
         VBox.setVgrow(root, Priority.ALWAYS);
 
-        Scene scene = new Scene(vbox, 1600, 1200);
+        Scene scene = new Scene(vbox, 800, 600);
         primaryStage.setScene(scene);
 
         primaryStage.setMaxHeight(800);

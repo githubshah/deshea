@@ -10,6 +10,12 @@ public class MessagePacket {
         this.event = event;
     }
 
+    public MessagePacket(String email, String event, String connectTo) {
+        this.email = email;
+        this.event = event;
+        this.connectTo = connectTo;
+    }
+
     public String getEmail() {
         return email;
     }

@@ -76,6 +76,10 @@ public class SocketBridge {
                             break;
                         case "noreceptionist":
                             System.out.println("no recep");
+//                            MessagePacket connect =
+//                                new MessagePacket("sahid@gmail.com", "connactto", "sahid@gmail.com");
+//                            DataOutputStream dout = new DataOutputStream(eventSocket.getOutputStream());
+//                            dout.writeUTF(new Gson().toJson(connect));
                             break;
                         case "connactto":
                             break;
