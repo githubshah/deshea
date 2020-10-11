@@ -24,6 +24,7 @@ public class UserSessionThread extends Thread {
             try {
                 DataInputStream din = new DataInputStream(socket.getInputStream());
                 String msg = din.readUTF();
+                System.out.println(msg);
                 MessagePacket messagePacket = new Gson().fromJson(msg, MessagePacket.class);
                 String type = messagePacket.getType();
                 switch (messagePacket.getEvent()) {
