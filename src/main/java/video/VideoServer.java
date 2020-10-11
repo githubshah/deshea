@@ -64,19 +64,19 @@ public class VideoServer {
         }
     }
 
-    public static void main(String[] args) {
-        new Thread(() -> {
-            VideoServer server = new VideoServer();
-            server.openVideoServerSocket();
-        }).start();
-
-        new Thread(() -> {
-            VideoServer server1 = new VideoServer();
-            server1.openInfoServerSocket();
-
-        }).start();
-
-    }
+//    public static void main(String[] args) {
+//        new Thread(() -> {
+//            VideoServer server = new VideoServer();
+//            server.openVideoServerSocket();
+//        }).start();
+//
+//        new Thread(() -> {
+//            VideoServer server1 = new VideoServer();
+//            server1.openInfoServerSocket();
+//
+//        }).start();
+//
+//    }
 
     public void broadcast(byte[] data, Socket from) {
         System.out.println("userThreads size: " + videoThreadPool.size());

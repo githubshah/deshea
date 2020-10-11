@@ -149,7 +149,18 @@ public class Main {
 
     public static void main(String args[]) throws Exception {
         //new Main().runVOIP();
-        new VideoServer().openVideoServerSocket();
-        new VideoServer().openInfoServerSocket();
+//        new VideoServer().openVideoServerSocket();
+//        new VideoServer().openInfoServerSocket();
+
+        new Thread(() -> {
+            VideoServer server = new VideoServer();
+            server.openVideoServerSocket();
+        }).start();
+
+        new Thread(() -> {
+            VideoServer server1 = new VideoServer();
+            server1.openInfoServerSocket();
+
+        }).start();
     }
 }
