@@ -66,15 +66,15 @@ public class UserSessionThread extends Thread {
                         this.ip = socket.getInetAddress().getHostName();
                         server.createSession(email, ip);
                         if (server.hasConnection(ip)) {
-                            MessagePacket connect124 =
+                            MessagePacket available =
                                 new MessagePacket(messagePacket.email, Constants.RECEPTIONIST_AVAILABLE, type);
-                            DataOutputStream receptionist_Available = new DataOutputStream(socket.getOutputStream());
-                            receptionist_Available.writeUTF(new Gson().toJson(connect124));
+                            DataOutputStream receptionistAvailable = new DataOutputStream(socket.getOutputStream());
+                            receptionistAvailable.writeUTF(new Gson().toJson(available));
                         } else {
-                            MessagePacket connect13 =
+                            MessagePacket notAvailable =
                                 new MessagePacket(messagePacket.email, Constants.RECEPTIONIST_NOT_AVAILABLE, type);
-                            DataOutputStream dout13 = new DataOutputStream(socket.getOutputStream());
-                            dout13.writeUTF(new Gson().toJson(connect13));
+                            DataOutputStream receptionistNotAvailable = new DataOutputStream(socket.getOutputStream());
+                            receptionistNotAvailable.writeUTF(new Gson().toJson(notAvailable));
                         }
                         break;
                     default:
